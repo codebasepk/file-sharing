@@ -9,6 +9,7 @@
 
 
     <ScrollView
+        android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:isScrollContainer="false"
@@ -97,7 +98,52 @@
     </ScrollView>
 
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/layout_social"
+        android:layout_marginBottom="30dp"
+        android:gravity="center"
+        android:text="OR"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/layout_social"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/layout_signup"
+        android:layout_marginBottom="20dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/facebook_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginRight="10dp"
+            android:background="@mipmap/facebook" />
+
+
+        <ImageButton
+            android:id="@+id/googel_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginRight="10dp"
+            android:background="@mipmap/google" />
+
+        <ImageButton
+            android:id="@+id/twitter_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:background="@mipmap/twitter" />
+    </LinearLayout>
+
+
     <RelativeLayout
+        android:id="@+id/layout_signup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
