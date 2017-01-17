@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, ActivitySendFile.class));
                 break;
             case R.id.button_receive:
+                startActivity(new Intent(this, ActivityReceiveFile.class));
                 break;
         }
     }
