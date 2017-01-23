@@ -17,4 +17,6 @@
         <item name="colorButtonNormal">@color/button_color</item>
         <item name="android:textColor">@color/button_text_color</item>
     </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 </resources>
