@@ -8,15 +8,30 @@
     android:fitsSystemWindows="true"
     tools:context="com.byteshaft.filesharing.ActivitySendFile">
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/appbar_padding_top"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
     <android.support.design.widget.TabLayout
         android:id="@+id/tabs"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:tabBackground="@android:color/white"
+        app:tabSelectedTextColor="@color/colorPrimary"
+        app:tabTextColor="@android:color/black"/>
+    </android.support.design.widget.AppBarLayout>
 
     <android.support.v4.view.ViewPager
-        android:id="@+id/container"
+        android:id="@+id/view_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+
+        </android.support.v4.view.ViewPager>
+
+    <include layout="@layout/main_container" />
 
 </android.support.design.widget.CoordinatorLayout>
