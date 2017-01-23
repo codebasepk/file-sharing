@@ -22,10 +22,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.filesharing.R;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 public class PhotosFragment extends Fragment {
@@ -34,22 +34,20 @@ public class PhotosFragment extends Fragment {
     private ArrayList<String> folderList;
     private Adapter adapter;
     private static final int STORAGE_PERMISSION = 0;
-    private HashMap<String, String> foldersList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
         folderList = new ArrayList<>();
-        foldersList = new HashMap<>();
         gridLayout = (GridView) rootView.findViewById(R.id.folders_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
-                R.layout.delegate_folder, folderList);
+                R.layout.delegate_photo_fragment, folderList);
         gridLayout.setAdapter(adapter);
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("TAG", "Folder "+ foldersList.get(folderList.get(i)));
+//                Log.i("TAG", "Folder "+ foldersList.get(folderList.get(i)));
             }
         });
         if (ContextCompat.checkSelfPermission(getActivity(),
@@ -96,16 +94,14 @@ public class PhotosFragment extends Fragment {
             absolutePathOfImage = cursor.getString(column_index_data);
             File file = new File(absolutePathOfImage);
             Log.i("TAG", "Image " + absolutePathOfImage + " parent " + file.getParentFile().getName());
-            if (!folderList.contains(file.getParentFile().getName())) {
-                foldersList.put(file.getParentFile().getName(),
-                        file.getParentFile().toString());
-                folderList.add(file.getParentFile().getName());
+            if (!folderList.contains(absolutePathOfImage)) {
+                folderList.add(absolutePathOfImage);
                 adapter.notifyDataSetChanged();
             }
         }
     }
 
-    class Adapter extends ArrayAdapter<ArrayList<String>> {
+    private class Adapter extends ArrayAdapter<ArrayList<String>> {
 
         private ArrayList<String> folderList;
         private ViewHolder viewHolder;
@@ -119,29 +115,29 @@ public class PhotosFragment extends Fragment {
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
-                convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_folder, parent, false);
+                convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_photo_fragment, parent, false);
                 viewHolder.folderImage = (ImageView) convertView.findViewById(R.id.folder_image);
-                viewHolder.folderName = (TextView) convertView.findViewById(R.id.folder_name);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            viewHolder.folderName.setText(folderList.get(position));
+            File f = new File(folderList.get(position));
+            Picasso.with(getActivity())
+                    .load(f)
 
+                    .resize(250, 250)
+                    .centerCrop()
+                    .into(viewHolder.folderImage);
             return convertView;
-
         }
 
         @Override
         public int getCount() {
             return folderList.size();
-
         }
     }
 
-    class ViewHolder {
-        TextView folderName;
+    private class ViewHolder {
         ImageView folderImage;
-
     }
 }

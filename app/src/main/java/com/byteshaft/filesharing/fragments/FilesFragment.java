@@ -36,16 +36,15 @@ public class FilesFragment extends Fragment {
     private ArrayList<String> folderList;
     private Adapter adapter;
     private static final int STORAGE_PERMISSION = 0;
-    private File path;
-    private HashMap<String, String> foldersList;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.files_fragment, container, false);
-        path = new File(Environment.getExternalStorageDirectory() + "");
         folderList = new ArrayList<>();
-        foldersList = new HashMap<>();
+        folderList.add("Document");
+        folderList.add("Zip");
+        folderList.add("E-Book");
         gridLayout = (GridView) rootView.findViewById(R.id.folders_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_folder, folderList);
@@ -53,7 +52,15 @@ public class FilesFragment extends Fragment {
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.i("TAG", "Folder "+ foldersList.get(folderList.get(i)));
+                Log.i("TAG", "click");
+                Bundle bundle = new Bundle();
+                bundle.putString("folder", folderList.get(i));
+                FolderDetailFragment nextFrag= new FolderDetailFragment();
+                nextFrag.setArguments(bundle);
+                getFragmentManager().beginTransaction()
+                        .replace(R.id.frame_folder, nextFrag, "Folder_detail")
+                        .addToBackStack("folder_detail")
+                        .commit();
             }
         });
         if (ContextCompat.checkSelfPermission(getActivity(),
@@ -61,69 +68,9 @@ public class FilesFragment extends Fragment {
                 != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION);
         } else {
-            new GetFiles().execute();
+
         }
         return rootView;
-    }
-
-    class GetFiles extends AsyncTask<String, String, String> {
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected String doInBackground(String... strings) {
-            searchFolderRecursive(path);
-            return null;
-        }
-
-        private void searchFolderRecursive(File dir) {
-            String pdfPattern = ".pdf";
-            String txtPattern = ".txt";
-            String docPattern = ".doc";
-            String apkPatterns = ".apk";
-            String zipPattern = ".zip";
-
-            File listFile[] = dir.listFiles();
-
-            if (listFile != null) {
-                for (int i = 0; i < listFile.length; i++) {
-
-                    if (listFile[i].isDirectory()) {
-                        if (!listFile[i].getParentFile().getName().equals("Android"))
-                        searchFolderRecursive(listFile[i]);
-                    } else {
-                        if (listFile[i].getName().endsWith(pdfPattern) ||
-                                listFile[i].getName().endsWith(txtPattern) ||
-                                listFile[i].getName().endsWith(docPattern) ||
-                                listFile[i].getName().endsWith(apkPatterns) ||
-                                listFile[i].getName().endsWith(zipPattern)) {
-                            File file = listFile[i];
-                            if (!folderList.contains(file.getParentFile().getName())) {
-                                Log.i("File", "" + listFile[i].getParentFile());
-                                foldersList.put(file.getParentFile().getName(),
-                                        file.getParentFile().toString());
-                                folderList.add(file.getParentFile().getName());
-                                publishProgress();
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-            adapter.notifyDataSetChanged();
-        }
-
-        @Override
-        protected void onPostExecute(String s) {
-            super.onPostExecute(s);
-        }
     }
 
     @Override
@@ -133,14 +80,14 @@ public class FilesFragment extends Fragment {
             case STORAGE_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    new GetFiles().execute();
+
                 } else {
                     Toast.makeText(getActivity(), "permission denied!", Toast.LENGTH_SHORT).show();
                 }
         }
     }
 
-    class Adapter extends ArrayAdapter<ArrayList<String>> {
+    private class Adapter extends ArrayAdapter<ArrayList<String>> {
 
         private ArrayList<String> folderList;
         private ViewHolder viewHolder;
@@ -161,6 +108,13 @@ public class FilesFragment extends Fragment {
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            if (folderList.get(position).endsWith("Zip")) {
+                viewHolder.folderImage.setImageResource(R.mipmap.zip);
+            } else if (folderList.get(position).endsWith("Document")) {
+                viewHolder.folderImage.setImageResource(R.mipmap.document);
+            } else if (folderList.get(position).endsWith("E-Book")) {
+                viewHolder.folderImage.setImageResource(R.mipmap.ebook);
+            }
             viewHolder.folderName.setText(folderList.get(position));
 
             return convertView;
@@ -170,11 +124,10 @@ public class FilesFragment extends Fragment {
         @Override
         public int getCount() {
             return folderList.size();
-
         }
     }
 
-    class ViewHolder {
+    private class ViewHolder {
         TextView folderName;
         ImageView folderImage;
 
