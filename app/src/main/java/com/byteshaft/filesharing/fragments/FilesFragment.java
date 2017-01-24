@@ -35,7 +35,7 @@ public class FilesFragment extends Fragment {
         folderList = new ArrayList<>();
         folderList.add("Document");
         folderList.add("Zip");
-        folderList.add("E-Book");cd 
+        folderList.add("E-Book");
         gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_folder, folderList);
@@ -46,7 +46,7 @@ public class FilesFragment extends Fragment {
                 Log.i("TAG", "click");
                 Bundle bundle = new Bundle();
                 bundle.putString("folder", folderList.get(i));
-                FolderDetailFragment nextFrag= new FolderDetailFragment();
+                FolderDetailFragment nextFrag = new FolderDetailFragment();
                 nextFrag.setArguments(bundle);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.frame_folder, nextFrag, "Folder_detail")
