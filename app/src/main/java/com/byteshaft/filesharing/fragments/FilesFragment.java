@@ -46,7 +46,7 @@ public class FilesFragment extends Fragment {
                 Log.i("TAG", "click");
                 Bundle bundle = new Bundle();
                 bundle.putString("folder", folderList.get(i));
-                FolderDetailFragment nextFrag= new FolderDetailFragment();
+                FolderDetailFragment nextFrag = new FolderDetailFragment();
                 nextFrag.setArguments(bundle);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.frame_folder, nextFrag, "Folder_detail")
