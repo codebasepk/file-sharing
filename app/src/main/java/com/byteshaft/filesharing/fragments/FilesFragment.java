@@ -35,7 +35,7 @@ public class FilesFragment extends Fragment {
         folderList = new ArrayList<>();
         folderList.add("Document");
         folderList.add("Zip");
-        folderList.add("E-Book");cd 
+        folderList.add("E-Book");
         gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_folder, folderList);
