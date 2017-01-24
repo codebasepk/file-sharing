@@ -2,15 +2,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_centerHorizontal="true"
-    android:layout_centerInParent="true"
-    android:layout_margin="2dp">
+    >
 
-    <ImageView
-        android:id="@+id/folder_image"
-        android:src="@mipmap/facebook"
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp">
+
+    <ImageView
+        android:id="@+id/folder_video"
+        android:src="@mipmap/facebook"
+        android:layout_marginLeft="2dp"
+        android:layout_marginRight="5dp"
         android:scaleType="centerCrop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -21,7 +27,8 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:id="@+id/checkBox" />
+        </RelativeLayout>
 
 </RelativeLayout>

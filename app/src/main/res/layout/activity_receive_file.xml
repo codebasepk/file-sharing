@@ -7,6 +7,16 @@
     android:background="@color/background_color"
     tools:context="com.byteshaft.filesharing.ActivityReceiveFile">
 
+    <TextView
+        android:text="Searching ..."
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/radarView"
+        android:layout_marginBottom="20dp"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        android:layout_centerHorizontal="true"/>
+
 
     <com.byteshaft.filesharing.utils.RadarView
         android:id="@+id/radarView"
