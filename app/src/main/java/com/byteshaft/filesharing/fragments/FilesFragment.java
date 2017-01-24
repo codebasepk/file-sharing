@@ -64,6 +64,7 @@ public class FilesFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 selectedFolder = i;
                 setUpAdapter(folderList.get(i));
+
             }
         });
         new GetFiles().execute();
