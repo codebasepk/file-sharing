@@ -1,15 +1,11 @@
 package com.byteshaft.filesharing.fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,8 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.filesharing.R;
 import com.squareup.picasso.Picasso;
@@ -33,14 +27,13 @@ public class PhotosFragment extends Fragment {
     private GridView gridLayout;
     private ArrayList<String> folderList;
     private Adapter adapter;
-    private static final int STORAGE_PERMISSION = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
         folderList = new ArrayList<>();
-        gridLayout = (GridView) rootView.findViewById(R.id.folders_grid);
+        gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_photo_fragment, folderList);
         gridLayout.setAdapter(adapter);
@@ -50,28 +43,8 @@ public class PhotosFragment extends Fragment {
 //                Log.i("TAG", "Folder "+ foldersList.get(folderList.get(i)));
             }
         });
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION);
-        } else {
-            getAllShownImages();
-        }
+        getAllShownImages();
         return rootView;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case STORAGE_PERMISSION:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getAllShownImages();
-                } else {
-                    Toast.makeText(getActivity(), "permission denied!", Toast.LENGTH_SHORT).show();
-                }
-        }
     }
 
     public  void getAllShownImages() {
@@ -85,7 +58,7 @@ public class PhotosFragment extends Fragment {
                 MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
 
         cursor = getActivity().getContentResolver().query(uri, projection, null,
-                null, null);
+                null,  MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         column_index_folder_name = cursor

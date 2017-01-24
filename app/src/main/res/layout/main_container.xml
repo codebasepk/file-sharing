@@ -17,14 +17,19 @@
         android:layout_alignParentBottom="true"
         android:orientation="horizontal">
 
-        <ImageButton
+        <Button
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:src="@mipmap/facebook"
+            android:text="Selected"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
             android:background="@drawable/rounded_button"
             android:layout_weight="1"/>
-        <ImageButton
+        <Button
             android:layout_width="0dp"
+            android:textAllCaps="false"
+            android:text="Next"
+            android:textColor="@android:color/white"
             android:layout_height="wrap_content"
             android:src="@mipmap/facebook"
             android:background="@drawable/rounded_button"

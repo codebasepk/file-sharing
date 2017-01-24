@@ -1,14 +1,8 @@
 package com.byteshaft.filesharing.fragments;
 
-import android.Manifest;
 import android.content.Context;
-import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,13 +12,10 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.byteshaft.filesharing.R;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by shahid on 17/01/2017.
@@ -44,8 +35,8 @@ public class FilesFragment extends Fragment {
         folderList = new ArrayList<>();
         folderList.add("Document");
         folderList.add("Zip");
-        folderList.add("E-Book");
-        gridLayout = (GridView) rootView.findViewById(R.id.folders_grid);
+        folderList.add("E-Book");cd 
+        gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_folder, folderList);
         gridLayout.setAdapter(adapter);
@@ -63,28 +54,7 @@ public class FilesFragment extends Fragment {
                         .commit();
             }
         });
-        if (ContextCompat.checkSelfPermission(getActivity(),
-                Manifest.permission.READ_EXTERNAL_STORAGE)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, STORAGE_PERMISSION);
-        } else {
-
-        }
         return rootView;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case STORAGE_PERMISSION:
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-                } else {
-                    Toast.makeText(getActivity(), "permission denied!", Toast.LENGTH_SHORT).show();
-                }
-        }
     }
 
     private class Adapter extends ArrayAdapter<ArrayList<String>> {

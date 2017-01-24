@@ -41,6 +41,7 @@
 
         <activity
             android:name=".ActivityReceiveFile"
+            android:theme="@style/AppTheme.NoActionBar"
             android:screenOrientation="portrait" />
 
     </application>
