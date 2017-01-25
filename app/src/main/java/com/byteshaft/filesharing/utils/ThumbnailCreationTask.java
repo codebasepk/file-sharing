@@ -2,19 +2,11 @@ package com.byteshaft.filesharing.utils;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.provider.MediaStore;
 
 import com.byteshaft.filesharing.fragments.VideosFragment;
-
-import static android.media.ThumbnailUtils.createVideoThumbnail;
-
-/**
- * Created by s9iper1 on 1/24/17.
- */
 
 public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
 

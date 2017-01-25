@@ -23,10 +23,6 @@ import com.byteshaft.filesharing.R;
 import java.io.File;
 import java.util.ArrayList;
 
-/**
- * Created by shahid on 17/01/2017.
- */
-
 public class FilesFragment extends Fragment {
 
     private GridView gridLayout;
