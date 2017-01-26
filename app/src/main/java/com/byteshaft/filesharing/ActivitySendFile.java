@@ -1,34 +1,55 @@
 package com.byteshaft.filesharing;
 
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.widget.Button;
 
 import com.byteshaft.filesharing.fragments.FilesFragment;
 import com.byteshaft.filesharing.fragments.MusicFragment;
 import com.byteshaft.filesharing.fragments.PhotosFragment;
 import com.byteshaft.filesharing.fragments.VideosFragment;
 
+import java.util.HashMap;
+
 
 public class ActivitySendFile extends AppCompatActivity {
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+    public static HashMap<String, String> selectedHashMap;
+    private Button selectedButton;
+    private Button nextButton;
+    private static ActivitySendFile sInstance;
+
+    public static ActivitySendFile getInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_file);
+        sInstance = this;
+        selectedHashMap = new HashMap<>();
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        selectedButton = (Button) findViewById(R.id.selected);
+        nextButton  = (Button) findViewById(R.id.next);
+        selectedButton.setText("Selected");
+        setSelection();
+    }
+
+    public void setSelection() {
+        selectedButton.setText(String.format("selected(%d)", selectedHashMap.size()));
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

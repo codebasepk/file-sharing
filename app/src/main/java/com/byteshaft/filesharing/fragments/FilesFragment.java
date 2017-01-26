@@ -12,12 +12,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
+import android.widget.CheckedTextView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
 
 import java.io.File;
@@ -48,6 +51,49 @@ public class FilesFragment extends Fragment {
         folderList.add("E-Book");
         path = new File(Environment.getExternalStorageDirectory() + "");
         listView = (ListView) rootView.findViewById(R.id.list_view);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (selectedFolder == 0) {
+                    File file = new File(documentList.get(i));
+                    Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
+                    Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
+                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.VISIBLE);
+                    } else {
+                        ActivitySendFile.selectedHashMap.remove(file.getName());
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(false);
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
+                    }
+                } else if (selectedFolder == 1) {
+                    File file = new File(zipList.get(i));
+                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.VISIBLE);
+                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                    } else {
+                        ActivitySendFile.selectedHashMap.remove(file.getName());
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(false);
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
+                    }
+                } else if (selectedFolder == 2) {
+                    File file = new File(eBook.get(i));
+                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.VISIBLE);
+                    } else {
+                        ActivitySendFile.selectedHashMap.remove(file.getName());
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(false);
+                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
+                    }
+                }
+                ActivitySendFile.getInstance().setSelection();
+            }
+        });
         eBook = new ArrayList<>();
         documentList = new ArrayList<>();
         zipList = new ArrayList<>();
@@ -160,6 +206,7 @@ public class FilesFragment extends Fragment {
                 filesHolder.fileImage = (ImageView) convertView.findViewById(R.id.file_image);
                 filesHolder.fileName = (TextView) convertView.findViewById(R.id.file_name);
                 filesHolder.fileSize = (TextView) convertView.findViewById(R.id.file_size);
+                filesHolder.mCheckBox = (CheckBox) convertView.findViewById(R.id.selectionCheckbox);
                 convertView.setTag(filesHolder);
             } else {
                 filesHolder = (FilesHolder) convertView.getTag();
@@ -167,6 +214,15 @@ public class FilesFragment extends Fragment {
             File file = new File(folderList.get(position));
             filesHolder.fileName.setText(file.getName());
             filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(),file.length()));
+            Log.i("TAG", "File "+ String.valueOf(filesHolder == null));
+            Log.i("TAG", "File "+ String.valueOf(filesHolder.mCheckBox == null));
+            if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                filesHolder.mCheckBox.setVisibility(View.VISIBLE);
+                filesHolder.mCheckBox.setChecked(true);
+            } else {
+                filesHolder.mCheckBox.setVisibility(View.INVISIBLE);
+                filesHolder.mCheckBox.setChecked(false);
+            }
 
             return convertView;
 
@@ -182,6 +238,7 @@ public class FilesFragment extends Fragment {
         TextView fileName;
         TextView fileSize;
         ImageView fileImage;
+        CheckBox mCheckBox;
 
     }
 

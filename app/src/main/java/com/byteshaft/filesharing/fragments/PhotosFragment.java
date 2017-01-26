@@ -3,6 +3,7 @@ package com.byteshaft.filesharing.fragments;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -43,8 +44,22 @@ public class PhotosFragment extends Fragment {
 //                Log.i("TAG", "Folder "+ foldersList.get(folderList.get(i)));
             }
         });
-        getAllShownImages();
+        new GetAllImages().execute();
         return rootView;
+    }
+
+    class GetAllImages extends AsyncTask<String, String, String> {
+        @Override
+        protected String doInBackground(String... strings) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    getAllShownImages();
+                }
+            });
+
+            return null;
+        }
     }
 
     public  void getAllShownImages() {
