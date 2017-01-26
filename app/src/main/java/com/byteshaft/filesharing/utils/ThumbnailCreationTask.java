@@ -27,7 +27,6 @@ public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
         Bitmap bitmap =  ThumbnailUtils.createVideoThumbnail
                 (VideosFragment.getInstance().videoList.get(mHolder.position),
                         MediaStore.Video.Thumbnails.MINI_KIND);
-        Log.i("TAG", "Null" + String.valueOf(bitmap == null));
         if (bitmap != null)
         return Bitmap.createScaledBitmap(bitmap, 200, 200, true);
         else

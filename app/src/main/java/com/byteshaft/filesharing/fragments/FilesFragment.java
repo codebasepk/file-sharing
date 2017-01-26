@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.CheckedTextView;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -57,8 +56,6 @@ public class FilesFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (selectedFolder == 0) {
                     File file = new File(documentList.get(i));
-                    Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
-                    Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
                     if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
                         ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
                         ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
@@ -214,8 +211,6 @@ public class FilesFragment extends Fragment {
             File file = new File(folderList.get(position));
             filesHolder.fileName.setText(file.getName());
             filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(),file.length()));
-            Log.i("TAG", "File "+ String.valueOf(filesHolder == null));
-            Log.i("TAG", "File "+ String.valueOf(filesHolder.mCheckBox == null));
             if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
                 filesHolder.mCheckBox.setVisibility(View.VISIBLE);
                 filesHolder.mCheckBox.setChecked(true);
@@ -276,16 +271,13 @@ public class FilesFragment extends Fragment {
                             File file = listFile[i];
                             if (listFile[i].getName().endsWith(".zip") &&
                                     !zipList.contains(listFile[i].toString())) {
-                                Log.i("Zip", "" + listFile[i]);
                                 zipList.add(listFile[i].toString());
                                 publishProgress();
                             } else if (listFile[i].getName().endsWith(".pdf") ||
                                     listFile[i].getName().endsWith(".doc") && !documentList.contains(listFile[i].toString())) {
-                                Log.i("Document", "" + listFile[i]);
                                 documentList.add(listFile[i].toString());
                                 publishProgress();
                             } else if (listFile[i].getName().endsWith(".txt") && eBook.contains(listFile[i].toString())) {
-                                Log.i("E-book", "" + listFile[i]);
                                 eBook.add(listFile[i].toString());
                                 publishProgress();
                             }

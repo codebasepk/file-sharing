@@ -22,8 +22,6 @@ import com.byteshaft.filesharing.R;
 import java.io.File;
 import java.util.ArrayList;
 
-import static android.R.attr.id;
-
 /**
  * Created by shahid on 17/01/2017.
  */
@@ -47,8 +45,6 @@ public class MusicFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 File file = new File(musicList.get(i));
-                Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
-                Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
                 if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
                     ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
                     ((CheckBox) view.findViewById(R.id.music_checkbox)).setChecked(true);
@@ -91,8 +87,6 @@ public class MusicFragment extends Fragment {
 
 
         while(cursor.moveToNext()) {
-            Log.i("TAG" , "Music " +cursor.getString(cursor
-                    .getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)));
             String musicPath = cursor.getString(cursor
                     .getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
             for (String music: acceptedExtensions) {
