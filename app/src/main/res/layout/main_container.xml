@@ -18,6 +18,7 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/selected"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="Selected"
@@ -25,7 +26,9 @@
             android:textColor="@android:color/white"
             android:background="@drawable/rounded_button"
             android:layout_weight="1"/>
+
         <Button
+            android:id="@+id/next"
             android:layout_width="0dp"
             android:textAllCaps="false"
             android:text="Next"

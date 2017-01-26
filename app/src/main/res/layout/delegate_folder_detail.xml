@@ -38,8 +38,10 @@
     </LinearLayout>
 
     <CheckBox
-        android:id="@+id/checkbox"
+        android:id="@+id/selectionCheckbox"
         android:layout_weight="1"
+        android:visibility="invisible"
+        android:focusable="false"
         android:layout_gravity="center_vertical"
         android:layout_width="0dp"
         android:layout_height="wrap_content" />
