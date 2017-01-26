@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_receive_file"
     android:layout_width="match_parent"
@@ -8,21 +9,45 @@
     tools:context="com.byteshaft.filesharing.ActivityReceiveFile">
 
     <TextView
-        android:text="Searching ..."
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/radarView"
+        android:layout_above="@+id/pulsator"
+        android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
-        android:textSize="20sp"
+        android:text="Searching ..."
         android:textColor="@android:color/white"
-        android:layout_centerHorizontal="true"/>
+        android:textSize="20sp" />
 
 
-    <com.byteshaft.filesharing.utils.RadarView
-        android:id="@+id/radarView"
-        android:layout_width="240dp"
-        android:layout_height="240dp"
+    <pl.bclogic.pulsator4droid.library.PulsatorLayout
+        android:id="@+id/pulsator"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true" />
+        app:pulse_color="#80FFFFFF"
+        app:pulse_count="4"
+        app:pulse_duration="7000"
+        app:pulse_repeat="100"
+        app:pulse_startFromScratch="false">
 
+    </pl.bclogic.pulsator4droid.library.PulsatorLayout>
+
+    <com.github.siyamed.shapeimageview.CircularImageView
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@mipmap/ic_launcher"
+        app:siBorderColor="@android:color/white"
+        app:siBorderWidth="2dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/pulsator"
+        android:layout_centerHorizontal="true"
+        android:text="Test User"
+        android:textColor="@android:color/white"
+        android:textSize="16sp" />
 </RelativeLayout>

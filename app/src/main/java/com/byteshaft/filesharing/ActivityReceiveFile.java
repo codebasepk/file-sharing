@@ -6,12 +6,10 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
-import com.byteshaft.filesharing.utils.RadarView;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -22,11 +20,14 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import pl.bclogic.pulsator4droid.library.PulsatorLayout;
+
 public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
-    private RadarView mRadarView;
+//    private RadarView mRadarView;
     private Hotspot mHotspot;
+    PulsatorLayout pulsator;
     // FIXME: Make this configurable by user, must be >= 10 characters.
     private final String USERNAME = "testing123";
 
@@ -34,10 +35,11 @@ public class ActivityReceiveFile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_file);
-
-        mRadarView = (RadarView) findViewById(R.id.radarView);
-        mRadarView.setShowCircles(true);
-        startAnimation(mRadarView);
+        pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
+        pulsator.start();
+//        mRadarView = (RadarView) findViewById(R.id.radarView);
+//        mRadarView.setShowCircles(true);
+//        startAnimation(mRadarView);
         mHotspot = new Hotspot(getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -70,14 +72,14 @@ public class ActivityReceiveFile extends AppCompatActivity {
         super.onBackPressed();
         mHotspot.destroy();
     }
-
-    public void stopAnimation(View view) {
-        if (mRadarView != null) mRadarView.stopAnimation();
-    }
-
-    public void startAnimation(View view) {
-        if (mRadarView != null) mRadarView.startAnimation();
-    }
+//
+//    public void stopAnimation(View view) {
+//        if (mRadarView != null) mRadarView.stopAnimation();
+//    }
+//
+//    public void startAnimation(View view) {
+//        if (mRadarView != null) mRadarView.startAnimation();
+//    }
 
     private Thread incomingFileRequestThread = new Thread(new Runnable() {
         @Override
