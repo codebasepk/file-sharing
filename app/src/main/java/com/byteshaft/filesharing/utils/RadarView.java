@@ -9,10 +9,6 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-/**
- * Created by shahid on 17/01/2017.
- */
-
 public class RadarView extends View {
 
     private final String LOG = "RadarView";
