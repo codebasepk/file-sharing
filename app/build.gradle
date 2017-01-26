@@ -23,4 +23,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
     compile 'com.squareup.picasso:picasso:2.2.0'
+    compile 'pl.bclogic:pulsator4droid:1.0.3'
+    compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
 }
