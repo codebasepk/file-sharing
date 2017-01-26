@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background_color">
 
     <Button
         android:id="@+id/button_refresh_peers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="Refresh"/>
+        android:layout_centerInParent="true"
+        android:text="Refresh" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/button_refresh_peers">
+    <FrameLayout
+        android:id="@+id/radar_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true">
 
-        <ProgressBar
-            android:id="@+id/progress_bar_searching"
-            android:layout_centerInParent="true"
-            android:indeterminate="true"
+        <com.byteshaft.filesharing.utils.RadarView
+            android:id="@+id/radarView"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+             />
 
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-        </ListView>
-
-    </RelativeLayout>
+    </FrameLayout>
 
 </RelativeLayout>

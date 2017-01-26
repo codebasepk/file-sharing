@@ -11,14 +11,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
 
 import java.io.File;
 import java.util.ArrayList;
+
+import static android.R.attr.id;
 
 /**
  * Created by shahid on 17/01/2017.
@@ -42,7 +46,20 @@ public class MusicFragment extends Fragment {
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Log.i("TAG", "Folder "+ foldersList.get(musicList.get(i)));
+                File file = new File(musicList.get(i));
+                Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
+                Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
+                if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                    ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setChecked(true);
+                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setVisibility(View.VISIBLE);
+                } else {
+                    ActivitySendFile.selectedHashMap.remove(file.getName());
+                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setChecked(false);
+                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setVisibility(View.GONE);
+                }
+                ActivitySendFile.getInstance().setSelection();
+
             }
         });
         getAudioList();
@@ -108,13 +125,20 @@ public class MusicFragment extends Fragment {
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_music_fragment, parent, false);
                 viewHolder.folderImage = (ImageView) convertView.findViewById(R.id.music_image);
                 viewHolder.musicName = (TextView) convertView.findViewById(R.id.song_name);
+                viewHolder.musicCheckbox = (CheckBox) convertView.findViewById(R.id.music_checkbox);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File f = new File(folderList.get(position));
+            if (ActivitySendFile.selectedHashMap.containsKey(f.getName())) {
+                viewHolder.musicCheckbox.setVisibility(View.VISIBLE);
+                viewHolder.musicCheckbox.setChecked(true);
+            } else {
+                viewHolder.musicCheckbox.setVisibility(View.INVISIBLE);
+                viewHolder.musicCheckbox.setChecked(false);
+            }
             viewHolder.musicName.setText(f.getName());
-
             return convertView;
         }
 
@@ -127,5 +151,6 @@ public class MusicFragment extends Fragment {
     private class ViewHolder {
         ImageView folderImage;
         TextView musicName;
+        CheckBox musicCheckbox;
     }
 }

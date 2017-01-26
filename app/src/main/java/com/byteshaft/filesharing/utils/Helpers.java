@@ -2,6 +2,7 @@ package com.byteshaft.filesharing.utils;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -31,6 +32,25 @@ public class Helpers {
         } catch (UnsupportedEncodingException e) {
             return "UNABLE";
         }
+    }
+
+    public static boolean locationEnabled() {
+        LocationManager lm = (LocationManager) Application.getContext()
+                .getSystemService(Context.LOCATION_SERVICE);
+        boolean gps_enabled = false;
+        boolean network_enabled = false;
+
+        try {
+            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        } catch (Exception ex) {
+        }
+
+        try {
+            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+        } catch (Exception ex) {
+        }
+
+        return gps_enabled || network_enabled;
     }
 
     @WorkerThread

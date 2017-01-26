@@ -98,7 +98,7 @@ public class RadarView extends View {
         Paint localPaint = latestPaint[0]; // GREEN
 
         if (showCircles) {
-            canvas.drawCircle(i, i, j, localPaint);
+//            canvas.drawCircle(i, i, j, localPaint);
             canvas.drawCircle(i, i, j, localPaint);
             canvas.drawCircle(i, i, j * 3 / 4, localPaint);
             canvas.drawCircle(i, i, j >> 1, localPaint);
@@ -116,7 +116,6 @@ public class RadarView extends View {
         for (int x = POINT_ARRAY_SIZE - 1; x > 0; x--) {
             latestPoint[x] = latestPoint[x - 1];
         }
-
 
         int lines = 0;
         for (int x = 0; x < POINT_ARRAY_SIZE; x++) {

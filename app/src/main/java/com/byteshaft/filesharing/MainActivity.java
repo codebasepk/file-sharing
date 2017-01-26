@@ -53,8 +53,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_STORAGE_PERMISSION);
                 } else {
                     Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
-//                    startActivity(new Intent(this, ActivitySendFile.class));
+//                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
+                    startActivity(new Intent(this, ActivitySendFile.class));
                 }
                 break;
             case R.id.button_receive:
