@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.byteshaft.filesharing.utils.Application;
 import com.byteshaft.filesharing.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -39,7 +40,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonReceive = (Button) findViewById(R.id.button_receive);
         buttonSend.setOnClickListener(this);
         buttonReceive.setOnClickListener(this);
-        showDialog();
+        if (!Application.isRunningFirstTime()) {
+            showDialog();
+            Application.saveBoolean(true);
+        }
     }
 
     @Override
