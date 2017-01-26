@@ -9,7 +9,7 @@
         android:id="@+id/video_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="3"/>
+        android:numColumns="4"/>
 
 
 </FrameLayout>

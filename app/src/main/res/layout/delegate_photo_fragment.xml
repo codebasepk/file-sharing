@@ -20,8 +20,9 @@
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
         android:layout_alignParentRight="true"
+        android:focusable="false"
         android:visibility="gone"
         android:layout_alignParentBottom="true"
-        android:id="@+id/checkBox" />
+        android:id="@+id/photo_checkbox" />
 
 </RelativeLayout>

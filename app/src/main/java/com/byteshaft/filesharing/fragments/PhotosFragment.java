@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
 import com.squareup.picasso.Picasso;
 
@@ -26,22 +28,34 @@ import java.util.ArrayList;
 public class PhotosFragment extends Fragment {
 
     private GridView gridLayout;
-    private ArrayList<String> folderList;
+    private ArrayList<String> photoList;
     private Adapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
-        folderList = new ArrayList<>();
+        photoList = new ArrayList<>();
         gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
-                R.layout.delegate_photo_fragment, folderList);
+                R.layout.delegate_photo_fragment, photoList);
         gridLayout.setAdapter(adapter);
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Log.i("TAG", "Folder "+ foldersList.get(folderList.get(i)));
+                File file = new File(photoList.get(i));
+                Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
+                Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
+                if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                    ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setChecked(true);
+                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setVisibility(View.VISIBLE);
+                } else {
+                    ActivitySendFile.selectedHashMap.remove(file.getName());
+                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setChecked(false);
+                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setVisibility(View.GONE);
+                }
+                ActivitySendFile.getInstance().setSelection();
             }
         });
         new GetAllImages().execute();
@@ -82,8 +96,8 @@ public class PhotosFragment extends Fragment {
             absolutePathOfImage = cursor.getString(column_index_data);
             File file = new File(absolutePathOfImage);
             Log.i("TAG", "Image " + absolutePathOfImage + " parent " + file.getParentFile().getName());
-            if (!folderList.contains(absolutePathOfImage)) {
-                folderList.add(absolutePathOfImage);
+            if (!photoList.contains(absolutePathOfImage)) {
+                photoList.add(absolutePathOfImage);
                 adapter.notifyDataSetChanged();
             }
         }
@@ -105,11 +119,19 @@ public class PhotosFragment extends Fragment {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_photo_fragment, parent, false);
                 viewHolder.folderImage = (ImageView) convertView.findViewById(R.id.folder_image);
+                viewHolder.photoCheckBox = (CheckBox) convertView.findViewById(R.id.photo_checkbox);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File f = new File(folderList.get(position));
+            if (ActivitySendFile.selectedHashMap.containsKey(f.getName())) {
+                viewHolder.photoCheckBox.setVisibility(View.VISIBLE);
+                viewHolder.photoCheckBox.setChecked(true);
+            } else {
+                viewHolder.photoCheckBox.setVisibility(View.INVISIBLE);
+                viewHolder.photoCheckBox.setChecked(false);
+            }
             Picasso.with(getActivity())
                     .load(f)
 
@@ -127,5 +149,6 @@ public class PhotosFragment extends Fragment {
 
     private class ViewHolder {
         ImageView folderImage;
+        CheckBox photoCheckBox;
     }
 }
