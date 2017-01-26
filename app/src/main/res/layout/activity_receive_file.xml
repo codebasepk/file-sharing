@@ -34,6 +34,7 @@
     </pl.bclogic.pulsator4droid.library.PulsatorLayout>
 
     <com.github.siyamed.shapeimageview.CircularImageView
+        android:id="@+id/image_view"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_centerHorizontal="true"
@@ -43,6 +44,7 @@
         app:siBorderWidth="2dp" />
 
     <TextView
+        android:id="@+id/user_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/pulsator"

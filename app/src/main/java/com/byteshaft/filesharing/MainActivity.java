@@ -1,16 +1,22 @@
 package com.byteshaft.filesharing;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.byteshaft.filesharing.utils.Helpers;
@@ -22,6 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Button buttonReceive;
     private static final int READ_STORAGE_PERMISSION = 0;
     private static final int WRITE_STORAGE_PERMISSION = 1;
+    EditText mUsername;
+    String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonReceive = (Button) findViewById(R.id.button_receive);
         buttonSend.setOnClickListener(this);
         buttonReceive.setOnClickListener(this);
+        showDialog();
     }
 
     @Override
@@ -49,6 +58,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
             case R.id.button_receive:
+                System.out.println(
+                );
                 if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -99,5 +110,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     "image_url", Helpers.getImgPath(getApplicationContext(), selectedImage));
             startActivity(placeholderActivityIntent);
         }
+    }
+
+    private void showDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(MainActivity.this);
+        InputFilter[] FilterArray = new InputFilter[1];
+        FilterArray[0] = new InputFilter.LengthFilter(10);
+        alertDialog.setTitle("User Name");
+        alertDialog.setCancelable(false);
+        mUsername = new EditText(MainActivity.this);
+        mUsername.setHint("Enter your name..");
+
+        mUsername.setFilters(FilterArray);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        mUsername.setLayoutParams(lp);
+        alertDialog.setView(mUsername);
+
+        alertDialog.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (validate()) {
+                            PreferenceManager.getDefaultSharedPreferences(
+                                    getApplicationContext()).edit().putString("username", name).apply();
+                        }
+                    }
+                });
+
+        alertDialog.show();
+    }
+
+
+    public boolean validate() {
+        boolean valid = true;
+        name = mUsername.getText().toString();
+
+        if (name.isEmpty() || name.length() < 4) {
+            mUsername.setError("Enter minimum 4 characters");
+            valid = false;
+        } else {
+            mUsername.setError(null);
+        }
+        return valid;
     }
 }

@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
+import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -25,7 +28,9 @@ import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
-//    private RadarView mRadarView;
+    private CircularImageView imageView;
+    private TextView mUserName;
+    private String user;
     private Hotspot mHotspot;
     PulsatorLayout pulsator;
     // FIXME: Make this configurable by user, must be >= 10 characters.
@@ -35,11 +40,13 @@ public class ActivityReceiveFile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_file);
+        user = PreferenceManager.getDefaultSharedPreferences(
+                getApplicationContext()).getString("username", "User");
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-//        mRadarView = (RadarView) findViewById(R.id.radarView);
-//        mRadarView.setShowCircles(true);
-//        startAnimation(mRadarView);
+        imageView = (CircularImageView) findViewById(R.id.image_view);
+        mUserName = (TextView) findViewById(R.id.user_name);
+        mUserName.setText(user);
         mHotspot = new Hotspot(getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -72,14 +79,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
         super.onBackPressed();
         mHotspot.destroy();
     }
-//
-//    public void stopAnimation(View view) {
-//        if (mRadarView != null) mRadarView.stopAnimation();
-//    }
-//
-//    public void startAnimation(View view) {
-//        if (mRadarView != null) mRadarView.startAnimation();
-//    }
 
     private Thread incomingFileRequestThread = new Thread(new Runnable() {
         @Override
@@ -88,7 +87,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 int bytesRead;
                 ServerSocket serverSocket = new ServerSocket(0);
                 mHotspot.create(Helpers.generateSSID(
-                        USERNAME, String.valueOf(serverSocket.getLocalPort())));
+                        user, String.valueOf(serverSocket.getLocalPort())));
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     InputStream in = clientSocket.getInputStream();
