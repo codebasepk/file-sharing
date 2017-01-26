@@ -1,5 +1,6 @@
 package com.byteshaft.filesharing.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.LocationManager;
@@ -51,32 +52,6 @@ public class Helpers {
         }
 
         return gps_enabled || network_enabled;
-    }
-
-    @WorkerThread
-    public static void sendFileOverNetwork(String hostIP, String port, String filePath) {
-        try {
-            Socket sock = new Socket(hostIP, Integer.valueOf(port));
-            File myFile = new File(filePath);
-            byte[] fileBytesArray = new byte[(int) myFile.length()];
-            FileInputStream fis = new FileInputStream(myFile);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            DataInputStream dis = new DataInputStream(bis);
-            dis.readFully(fileBytesArray, 0, fileBytesArray.length);
-            OutputStream os = sock.getOutputStream();
-
-            //Sending file name and file size to the server
-            DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(myFile.getName());
-            dos.writeLong(fileBytesArray.length);
-            dos.write(fileBytesArray, 0, fileBytesArray.length);
-            dos.flush();
-
-            //Closing socket
-            sock.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public static void ensureDataDirectoryCreated(Context context) {

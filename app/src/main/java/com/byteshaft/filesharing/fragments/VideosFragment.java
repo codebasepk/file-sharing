@@ -53,8 +53,6 @@ public class VideosFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     File file = new File(videoList.get(i));
-                    Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
-                    Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
                     if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
                         ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
                         ((CheckBox) view.findViewById(R.id.videos_checkbox)).setChecked(true);
@@ -103,7 +101,6 @@ public class VideosFragment extends Fragment {
         while (cursor.moveToNext()) {
             absolutePathOfImage = cursor.getString(column_index_data);
             File file = new File(absolutePathOfImage);
-            Log.i("TAG", "Video " + absolutePathOfImage + " parent " + file.getParentFile().getName());
             if (!videoList.contains(absolutePathOfImage)) {
                 videoList.add(absolutePathOfImage);
                 adapter.notifyDataSetChanged();
