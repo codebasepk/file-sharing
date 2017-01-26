@@ -13,9 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 
+import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.utils.ThumbnailCreationTask;
 
@@ -50,7 +52,19 @@ public class VideosFragment extends Fragment {
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                Log.i("TAG", "Folder "+ foldersList.get(videoList.get(i)));
+                    File file = new File(videoList.get(i));
+                    Log.i("TAG", "File " + ActivitySendFile.selectedHashMap.containsKey(file.getName()));
+                    Log.i("TAG", "HashMap " + ActivitySendFile.selectedHashMap);
+                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setChecked(true);
+                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setVisibility(View.VISIBLE);
+                    } else {
+                        ActivitySendFile.selectedHashMap.remove(file.getName());
+                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setChecked(false);
+                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setVisibility(View.GONE);
+                    }
+                ActivitySendFile.getInstance().setSelection();
             }
         });
         new GetVideosTask().execute();
@@ -113,12 +127,21 @@ public class VideosFragment extends Fragment {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_video_fragment, parent, false);
                 viewHolder.videoImage = (ImageView) convertView.findViewById(R.id.folder_video);
+                viewHolder.checkbox = (CheckBox) convertView.findViewById(R.id.videos_checkbox);
                 viewHolder.position = position;
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
+            File file = new File(folderList.get(position));
             new ThumbnailCreationTask(getActivity().getApplicationContext(), viewHolder, position).execute();
+            if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+                viewHolder.checkbox.setVisibility(View.VISIBLE);
+                viewHolder.checkbox.setChecked(true);
+            } else {
+                viewHolder.checkbox.setVisibility(View.INVISIBLE);
+                viewHolder.checkbox.setChecked(false);
+            }
             return convertView;
         }
 
@@ -131,5 +154,6 @@ public class VideosFragment extends Fragment {
     public class ViewHolder {
         public int position;
         public ImageView videoImage;
+        public CheckBox checkbox;
     }
 }
