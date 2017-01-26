@@ -52,7 +52,7 @@ public class ActivitySendFile extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), ActivityReceiveFile.class));
+                startActivity(new Intent(getApplicationContext(), PlaceholderPeersActivity.class));
             }
         });
     }
