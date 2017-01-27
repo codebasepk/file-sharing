@@ -36,9 +36,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private TextView mUserName;
     private String user;
     private Hotspot mHotspot;
-    PulsatorLayout pulsator;
-    // FIXME: Make this configurable by user, must be >= 10 characters.
-    private final String USERNAME = "testing123";
+    private PulsatorLayout pulsator;
+    String path = Environment.getExternalStorageDirectory().getAbsolutePath();
+//    private final String USERNAME = "testing123";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +48,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 getApplicationContext()).getString("username", "User");
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
+
         imageView = (CircularImageView) findViewById(R.id.image_view);
         mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText(user);
