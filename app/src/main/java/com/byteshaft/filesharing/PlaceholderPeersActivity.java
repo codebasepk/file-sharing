@@ -153,11 +153,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         imageView.setId(index);
                         imageView.setImageResource(R.mipmap.ic_launcher);
                         TextView textView = new TextView(getApplicationContext());
-                        textView.setText(result.SSID);
+                        textView.setText(Helpers.decodeString(result.SSID.split("-")[1]));
                         layout.addView(imageView);
                         layout.addView(textView);
-                        layout.setX(10);
-                        layout.setY(10);
                         radarLayout.addView(layout);
                         imageView.setOnClickListener(new View.OnClickListener() {
                             @Override
@@ -165,6 +163,13 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                                 if (view instanceof ImageButton) {
                                     Log.i("TAG", "true");
                                     Log.i("TAG", "id " + view.getId());
+                                    Iterator it = ActivitySendFile.selectedHashMap.entrySet().iterator();
+                                    while (it.hasNext()) {
+                                        Map.Entry pair = (Map.Entry)it.next();
+                                        System.out.println(pair.getKey() + " = " + pair.getValue());
+                                        arrayList.add(String.valueOf(pair.getKey()));
+
+                                    }
                                     processClick(results.get(view.getId()));
                                     selectedScan = results.get(view.getId());
                                 }
@@ -203,16 +208,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 public void run() {
                     String hostIP = intToInetAddress(
                             mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                    Iterator it = ActivitySendFile.selectedHashMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry)it.next();
-                        System.out.println(pair.getKey() + " = " + pair.getValue());
-                        arrayList.add(String.valueOf(pair.getKey()));
-
-                    }
                     Log.i("TAG", " counter " + sendCounter);
-                    if (arrayList.size() > 0 && sendCounter <= arrayList.size()) {
-                        Log.i("TAG" , "item " + ActivitySendFile.selectedHashMap.get(arrayList.get(sendCounter)));
+                    if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
                     sendFileOverNetwork(hostIP, mPort,
                             ActivitySendFile.selectedHashMap.get(arrayList.get(sendCounter))
                             , new FileSentReceiver() {
