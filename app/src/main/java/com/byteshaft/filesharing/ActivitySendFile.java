@@ -10,12 +10,12 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.byteshaft.filesharing.fragments.FilesFragment;
 import com.byteshaft.filesharing.fragments.MusicFragment;
 import com.byteshaft.filesharing.fragments.PhotosFragment;
 import com.byteshaft.filesharing.fragments.VideosFragment;
-import com.byteshaft.filesharing.utils.RadarView;
 
 import java.util.HashMap;
 
@@ -46,13 +46,18 @@ public class ActivitySendFile extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         selectedButton = (Button) findViewById(R.id.selected);
-        nextButton  = (Button) findViewById(R.id.next);
+        nextButton = (Button) findViewById(R.id.next);
         selectedButton.setText("Selected");
         setSelection();
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), PlaceholderPeersActivity.class));
+                if (selectedHashMap.size() > 0) {
+                    startActivity(new Intent(getApplicationContext(), PlaceholderPeersActivity.class));
+                } else {
+                    Toast.makeText(getApplicationContext(),
+                            "No file selected", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

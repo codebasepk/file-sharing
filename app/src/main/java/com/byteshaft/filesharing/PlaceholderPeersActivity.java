@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
@@ -17,7 +18,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -25,8 +25,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.filesharing.utils.Helpers;
-import com.byteshaft.filesharing.utils.FileSentReceiver;
 import com.byteshaft.filesharing.utils.RadarView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -45,6 +47,7 @@ import java.util.Map;
 import static com.byteshaft.filesharing.utils.Helpers.intToInetAddress;
 
 public class PlaceholderPeersActivity extends AppCompatActivity implements View.OnClickListener {
+    private String mFilePath;
     private String mPort;
     private boolean mConnectionRequested;
     private boolean mScanRequested;
@@ -52,30 +55,31 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     private RadarView mRadarView;
     private FrameLayout radarLayout;
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 0;
-    private HashMap<Integer, ScanResult> results;
+    private HashMap<Integer, ScanResult> mResults = new HashMap<>();
     private int sendCounter = 0;
     private ArrayList<String> arrayList;
     private ScanResult selectedScan;
+    ImageButton mRefreshButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_peers_list);
 //        mImagePath = getIntent().getExtras().getString("image_url");
-        Button refreshButton = (Button) findViewById(R.id.button_refresh_peers);
+        mRefreshButton = (ImageButton) findViewById(R.id.button_refresh_peers);
         radarLayout = (FrameLayout) findViewById(R.id.radar_layout);
-        refreshButton.setOnClickListener(this);
+        mRefreshButton.setOnClickListener(this);
         arrayList = new ArrayList<>();
         mWifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
         registerReceiver(
                 mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
         mScanRequested = true;
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
             //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
-        }else{
+        } else {
             if (Helpers.locationEnabled()) {
                 mWifiManager.startScan();
             } else {
@@ -130,56 +134,68 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             if (intent.getAction().equals(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION) && mScanRequested) {
                 mScanRequested = false;
                 radarLayout = (FrameLayout) findViewById(R.id.radar_layout);
-                results = new HashMap<>();
-                List<ScanResult> filteredResults = new ArrayList<>();
+                mResults = new HashMap<>();
                 List<ScanResult> mScanResults = mWifiManager.getScanResults();
                 int index = 0;
                 for (ScanResult result : mScanResults) {
                     if (result.SSID.startsWith("SH-")) {
-                        Log.i("TAG", " Name "+ result.SSID);
-                        results.put(index, result);
-                        filteredResults.add(result);
-                        LinearLayout layout = new LinearLayout(getApplicationContext());
-                        layout.setOrientation(LinearLayout.VERTICAL);
-                        layout.setFocusable(true);
-                        layout.setClickable(true);
-                        Log.i("TAG", "set id " + layout.getId());
-                        LinearLayout.LayoutParams params = new LinearLayout
-                                .LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
-                                LinearLayout.LayoutParams.WRAP_CONTENT);
-                        layout.setLayoutParams(params);
-                        ImageButton imageView = new ImageButton(getApplicationContext());
-                        imageView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-                        imageView.setId(index);
-                        imageView.setImageResource(R.mipmap.ic_launcher);
-                        TextView textView = new TextView(getApplicationContext());
-                        textView.setText(Helpers.decodeString(result.SSID.split("-")[1]));
-                        layout.addView(imageView);
-                        layout.addView(textView);
-                        radarLayout.addView(layout);
-                        imageView.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                if (view instanceof ImageButton) {
-                                    Log.i("TAG", "true");
-                                    Log.i("TAG", "id " + view.getId());
-                                    Iterator it = ActivitySendFile.selectedHashMap.entrySet().iterator();
-                                    while (it.hasNext()) {
-                                        Map.Entry pair = (Map.Entry)it.next();
-                                        System.out.println(pair.getKey() + " = " + pair.getValue());
-                                        arrayList.add(String.valueOf(pair.getKey()));
-
-                                    }
-                                    processClick(results.get(view.getId()));
-                                    selectedScan = results.get(view.getId());
-                                }
-                            }
-                        });
+                        Log.i("TAG", " Name " + result.SSID);
+                        mResults.put(index, result);
+                        showOnMap(result, index);
+                        index++;
                     }
+                }
+                if (mResults.size() == 0) {
+                    mRefreshButton.setVisibility(View.VISIBLE);
+                    mRadarView.setVisibility(View.INVISIBLE);
                 }
             }
         }
     };
+
+    private void showOnMap(ScanResult result, int index) {
+        LinearLayout layout = new LinearLayout(getApplicationContext());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        layout.setFocusable(true);
+        layout.setClickable(true);
+        Log.i("TAG", "set id " + layout.getId());
+        LinearLayout.LayoutParams params = new LinearLayout
+                .LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        layout.setLayoutParams(params);
+        ImageButton imageView = new ImageButton(getApplicationContext());
+        imageView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        imageView.setId(index);
+        imageView.setImageResource(R.mipmap.ic_launcher);
+        TextView textView = new TextView(getApplicationContext());
+        String[] ssidData = result.SSID.split("-");
+        textView.setText(Helpers.decodeString(ssidData[1]));
+        layout.addView(imageView);
+        layout.addView(textView);
+        layout.setX(10);
+        layout.setY(10);
+        radarLayout.addView(layout);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (view instanceof ImageButton) {
+                    Log.i("TAG", "true");
+                    Log.i("TAG", "id " + view.getId());
+
+                    arrayList.clear();
+                    Iterator it = ActivitySendFile.selectedHashMap.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry pair = (Map.Entry) it.next();
+                        arrayList.add(String.valueOf(pair.getValue()));
+                    }
+                    ScanResult peer = mResults.get(view.getId());
+                    for (String filePath : arrayList) {
+                        processClick(peer, new File(filePath));
+                    }
+                }
+            }
+        });
+    }
 
     @Override
     public void onClick(View view) {
@@ -191,6 +207,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
                     mWifiManager.startScan();
+                    mRadarView.setVisibility(View.VISIBLE);
+                    mRefreshButton.setVisibility(View.INVISIBLE);
                 } else {
                     Toast.makeText(this, "location not enabled", Toast.LENGTH_SHORT).show();
                 }
@@ -198,10 +216,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         }
     }
 
-    protected void processClick(ScanResult scanResult) {
-        ScanResult device = scanResult;
-        String[] ssidData = device.SSID.split("-");
-        mPort = Helpers.decodeString(ssidData[2]);
+    protected void processClick(ScanResult device, final File fileToSend) {
+        mFilePath = fileToSend.getAbsolutePath();
+        mPort = Helpers.decodeString(device.SSID.split("-")[2]);
         if (mWifiManager.getConnectionInfo().getSSID().contains(device.SSID)) {
             new Thread(new Runnable() {
                 @Override
@@ -209,31 +226,33 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     String hostIP = intToInetAddress(
                             mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
                     Log.i("TAG", " counter " + sendCounter);
-                    if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
-                    sendFileOverNetwork(hostIP, mPort,
-                            ActivitySendFile.selectedHashMap.get(arrayList.get(sendCounter))
-                            , new FileSentReceiver() {
-                                @Override
-                                public void onFileSent() {
-                                    if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
-                                        sendCounter  = sendCounter+1;
-                                        Log.i("TAG", " counter ++" + sendCounter);
-                                        processClick(selectedScan);
-                                    }
-                                }
-                            });
-                    }
+
+                    sendFileOverNetwork(hostIP, mPort, mFilePath);
+//                    if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
+//                        sendFileOverNetwork(hostIP, mPort,
+//                                ActivitySendFile.selectedHashMap.get(arrayList.get(sendCounter))
+//                                , new FileSentReceiver() {
+//                                    @Override
+//                                    public void onFileSent() {
+//                                        if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
+//                                            sendCounter = sendCounter + 1;
+//                                            Log.i("TAG", " counter ++" + sendCounter);
+//                                            processClick(selectedScan);
+//                                        }
+//                                    }
+//                                });
+//                    }
                 }
             }).start();
         } else {
             WifiConfiguration conf = new WifiConfiguration();
             conf.SSID = "\"" + device.SSID + "\"";
             conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            final WifiManager wifiManager = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+            final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
             wifiManager.addNetwork(conf);
             List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-            for( WifiConfiguration i : list ) {
-                if(i.SSID != null && i.SSID.equals("\"" + device.SSID + "\"")) {
+            for (WifiConfiguration i : list) {
+                if (i.SSID != null && i.SSID.equals("\"" + device.SSID + "\"")) {
                     wifiManager.disconnect();
                     wifiManager.enableNetwork(i.networkId, true);
                     wifiManager.reconnect();
@@ -245,8 +264,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     }
 
     @WorkerThread
-    public static void sendFileOverNetwork(String hostIP, String port, String filePath,
-                                           FileSentReceiver fileSentReceiver) {
+    public static void sendFileOverNetwork(String hostIP, String port, String filePath) {
+        System.out.println(hostIP);
+        System.out.println(port);
         try {
             Socket sock = new Socket(hostIP, Integer.valueOf(port));
             File myFile = new File(filePath);
@@ -259,26 +279,38 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(myFile.getName());
+            dos.writeUTF(getMetadata(myFile.getName(), myFile.length()));
             dos.writeLong(fileBytesArray.length);
             dos.write(fileBytesArray, 0, fileBytesArray.length);
             dos.flush();
 
             //Closing socket
             sock.close();
-            fileSentReceiver.onFileSent();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    private static String getMetadata(String name, long size) {
+        JSONObject obj = new JSONObject();
+        try {
+            obj.put("name", name);
+            obj.put("size", size);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return obj.toString();
+    }
+
     private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
+            if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
                 NetworkInfo networkInfo =
                         intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                if (networkInfo.isConnected() && mConnectionRequested) {
+                if (ConnectivityManager.TYPE_WIFI == networkInfo.getType() &&
+                        networkInfo.isConnected() && mConnectionRequested) {
+                    System.out.println(mWifiManager.getConnectionInfo().getSSID());
                     mConnectionRequested = false;
                     new Thread(new Runnable() {
                         @Override
@@ -286,11 +318,12 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                             String hostIP = intToInetAddress(
                                     mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
                             try {
-                                Thread.sleep(6000);
+                                Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-//                            sendFileOverNetwork(hostIP, mPort, mImagePath);
+                            System.out.println("Waited and now trying to send");
+                            sendFileOverNetwork(hostIP, mPort, mFilePath);
                         }
                     }).start();
                 }
