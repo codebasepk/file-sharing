@@ -8,32 +8,35 @@
 
     <ImageView
         android:id="@+id/music_image"
-        android:src="@mipmap/ic_music_image"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerHorizontal="true"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
         android:scaleType="centerCrop"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true" />
+        android:src="@mipmap/ic_music_image" />
 
     <CheckBox
+        android:id="@+id/music_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@android:color/transparent"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
-        android:visibility="gone"
-        android:id="@+id/music_checkbox" />
+        android:background="@android:color/transparent"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/song_name"
-        android:text="Music Title"
-        android:textStyle="bold"
-        android:layout_margin="5dp"
-        android:focusable="false"
-        android:layout_below="@+id/music_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"/>
+        android:layout_below="@+id/music_image"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="5dp"
+        android:ellipsize="marquee"
+        android:focusable="false"
+        android:maxLength="10"
+        android:maxLines="1"
+        android:text="Music Title"
+        android:textStyle="bold" />
 
 </RelativeLayout>

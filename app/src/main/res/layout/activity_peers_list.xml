@@ -4,27 +4,28 @@
     android:layout_height="match_parent"
     android:background="@color/background_color">
 
-    <Button
+    <ImageButton
         android:id="@+id/button_refresh_peers"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:text="Refresh" />
+        android:background="@mipmap/ic_refresh"
+        android:text="Refresh"
+        android:visibility="invisible" />
 
     <FrameLayout
         android:id="@+id/radar_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="30dp"
         android:layout_centerHorizontal="true"
-        android:layout_centerInParent="true">
+        android:layout_centerInParent="true"
+        android:layout_margin="30dp">
 
         <com.byteshaft.filesharing.utils.RadarView
             android:id="@+id/radarView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-             />
+            android:layout_width="300dp"
+            android:layout_height="300dp" />
 
     </FrameLayout>
 

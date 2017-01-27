@@ -7,12 +7,16 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
+import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
 import com.github.siyamed.shapeimageview.CircularImageView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.DataInputStream;
 import java.io.File;
@@ -92,9 +96,12 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     Socket clientSocket = serverSocket.accept();
                     InputStream in = clientSocket.getInputStream();
                     DataInputStream clientData = new DataInputStream(in);
-                    String fileName = clientData.readUTF();
+                    String metadata = clientData.readUTF();
+                    JSONObject jsonObject = new JSONObject(metadata);
                     final File f = new File(
-                            Environment.getExternalStorageDirectory() + "/" + fileName);
+                            Environment.getExternalStorageDirectory() + "/" + jsonObject.optString("name"));
+                    String fileType = getMimeType(f.getAbsolutePath());
+                    System.out.println(fileType);
                     OutputStream output = new FileOutputStream(f);
                     long size = clientData.readLong();
                     byte[] buffer = new byte[8192];
@@ -117,7 +124,18 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
         }
     });
+
+    public static String getMimeType(String url) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
+        if (extension != null) {
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        }
+        return type;
+    }
 }
