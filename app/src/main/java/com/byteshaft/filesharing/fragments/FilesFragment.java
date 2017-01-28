@@ -88,6 +88,7 @@ public class FilesFragment extends Fragment {
                         ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
                     }
                 }
+                adapter.notifyDataSetChanged();
                 ActivitySendFile.getInstance().setSelection();
             }
         });
@@ -218,6 +219,7 @@ public class FilesFragment extends Fragment {
                 filesHolder.mCheckBox.setVisibility(View.INVISIBLE);
                 filesHolder.mCheckBox.setChecked(false);
             }
+            notifyDataSetChanged();
 
             return convertView;
 
@@ -246,7 +248,12 @@ public class FilesFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
-            searchFolderRecursive(path);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    searchFolderRecursive(path);
+                }
+            });
             return null;
         }
 
@@ -272,13 +279,16 @@ public class FilesFragment extends Fragment {
                             if (listFile[i].getName().endsWith(".zip") &&
                                     !zipList.contains(listFile[i].toString())) {
                                 zipList.add(listFile[i].toString());
+                                adapter.notifyDataSetChanged();
                                 publishProgress();
                             } else if (listFile[i].getName().endsWith(".pdf") ||
                                     listFile[i].getName().endsWith(".doc") && !documentList.contains(listFile[i].toString())) {
                                 documentList.add(listFile[i].toString());
+                                adapter.notifyDataSetChanged();
                                 publishProgress();
                             } else if (listFile[i].getName().endsWith(".txt") && eBook.contains(listFile[i].toString())) {
                                 eBook.add(listFile[i].toString());
+                                adapter.notifyDataSetChanged();
                                 publishProgress();
                             }
                         }
@@ -290,7 +300,9 @@ public class FilesFragment extends Fragment {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            adapter.notifyDataSetChanged();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
         }
 
         @Override
