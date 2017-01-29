@@ -59,12 +59,16 @@ public class FilesFragment extends Fragment {
                 } else if (selectedFolder == 2) {
                     file = new File(eBook.get(i));
                 }
-                if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                    ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                if (file == null) {
+                    return;
+                }
+                String filePath = file.getAbsolutePath();
+                if (!ActivitySendFile.sendList.contains(filePath)) {
+                    ActivitySendFile.sendList.add(filePath);
                     selectionCheckbox.setChecked(true);
                     selectionCheckbox.setVisibility(View.VISIBLE);
                 } else {
-                    ActivitySendFile.selectedHashMap.remove(file.getName());
+                    ActivitySendFile.sendList.remove(filePath);
                     selectionCheckbox.setChecked(false);
                     selectionCheckbox.setVisibility(View.GONE);
                 }
@@ -193,7 +197,7 @@ public class FilesFragment extends Fragment {
             File file = new File(folderList.get(position));
             filesHolder.fileName.setText(file.getName());
             filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(),file.length()));
-            if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+            if (ActivitySendFile.sendList.contains(file.getAbsolutePath())) {
                 filesHolder.mCheckBox.setVisibility(View.VISIBLE);
                 filesHolder.mCheckBox.setChecked(true);
             } else {

@@ -47,13 +47,14 @@ public class VideosFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 CheckBox videosCheckbox = (CheckBox) view.findViewById(R.id.videos_checkbox);
-                    File file = new File(videoList.get(i));
-                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                File file = new File(videoList.get(i));
+                String filePath = file.getAbsolutePath();
+                    if (!ActivitySendFile.sendList.contains(filePath)) {
+                        ActivitySendFile.sendList.add(filePath);
                         videosCheckbox.setChecked(true);
                         videosCheckbox.setVisibility(View.VISIBLE);
                     } else {
-                        ActivitySendFile.selectedHashMap.remove(file.getName());
+                        ActivitySendFile.sendList.remove(filePath);
                         videosCheckbox.setChecked(false);
                         videosCheckbox.setVisibility(View.GONE);
                     }
@@ -126,7 +127,7 @@ public class VideosFragment extends Fragment {
             }
             File file = new File(folderList.get(position));
             new ThumbnailCreationTask(getActivity().getApplicationContext(), viewHolder, position).execute();
-            if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+            if (ActivitySendFile.sendList.contains(file.getAbsolutePath())) {
                 viewHolder.checkbox.setVisibility(View.VISIBLE);
                 viewHolder.checkbox.setChecked(true);
             } else {

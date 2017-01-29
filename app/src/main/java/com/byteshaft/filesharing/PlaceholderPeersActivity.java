@@ -41,11 +41,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import static com.byteshaft.filesharing.utils.Helpers.intToInetAddress;
 import static com.byteshaft.filesharing.utils.Helpers.locationEnabled;
@@ -61,8 +58,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 0;
     private HashMap<Integer, ScanResult> mResults = new HashMap<>();
     private int sendCounter = 0;
-    private ArrayList<String> arrayList;
-    private ScanResult selectedScan;
     private ImageButton mRefreshButton;
     private static final int LOCATION_OFF = 0;
 
@@ -70,11 +65,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_peers_list);
-//        mImagePath = getIntent().getExtras().getString("image_url");
         mRefreshButton = (ImageButton) findViewById(R.id.button_refresh_peers);
         radarLayout = (FrameLayout) findViewById(R.id.radar_layout);
         mRefreshButton.setOnClickListener(this);
-        arrayList = new ArrayList<>();
         mWifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
         registerReceiver(
                 mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
@@ -224,15 +217,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 if (view instanceof ImageButton) {
                     Log.i("TAG", "true");
                     Log.i("TAG", "id " + view.getId());
-
-                    arrayList.clear();
-                    Iterator it = ActivitySendFile.selectedHashMap.entrySet().iterator();
-                    while (it.hasNext()) {
-                        Map.Entry pair = (Map.Entry) it.next();
-                        arrayList.add(String.valueOf(pair.getValue()));
-                    }
                     ScanResult peer = mResults.get(view.getId());
-                    for (String filePath : arrayList) {
+                    for (String filePath : ActivitySendFile.sendList) {
                         processClick(peer, new File(filePath));
                     }
                 }
@@ -271,20 +257,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     Log.i("TAG", " counter " + sendCounter);
 
                     sendFileOverNetwork(hostIP, mPort, mFilePath);
-//                    if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
-//                        sendFileOverNetwork(hostIP, mPort,
-//                                ActivitySendFile.selectedHashMap.get(arrayList.get(sendCounter))
-//                                , new FileSentReceiver() {
-//                                    @Override
-//                                    public void onFileSent() {
-//                                        if (arrayList.size() > 0 && sendCounter < arrayList.size()) {
-//                                            sendCounter = sendCounter + 1;
-//                                            Log.i("TAG", " counter ++" + sendCounter);
-//                                            processClick(selectedScan);
-//                                        }
-//                                    }
-//                                });
-//                    }
                 }
             }).start();
         } else {

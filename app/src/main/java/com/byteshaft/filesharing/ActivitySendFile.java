@@ -17,12 +17,12 @@ import com.byteshaft.filesharing.fragments.MusicFragment;
 import com.byteshaft.filesharing.fragments.PhotosFragment;
 import com.byteshaft.filesharing.fragments.VideosFragment;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 
 
 public class ActivitySendFile extends AppCompatActivity {
 
-    public static HashMap<String, String> selectedHashMap;
+    public static ArrayList<String> sendList;
     private Button selectedButton;
     private static ActivitySendFile sInstance;
 
@@ -35,7 +35,7 @@ public class ActivitySendFile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_file);
         sInstance = this;
-        selectedHashMap = new HashMap<>();
+        sendList = new ArrayList<>();
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
@@ -49,7 +49,7 @@ public class ActivitySendFile extends AppCompatActivity {
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedHashMap.size() > 0) {
+                if (sendList.size() > 0) {
                     startActivity(new Intent(getApplicationContext(), PlaceholderPeersActivity.class));
                 } else {
                     Toast.makeText(getApplicationContext(),
@@ -60,7 +60,7 @@ public class ActivitySendFile extends AppCompatActivity {
     }
 
     public void setSelection() {
-        selectedButton.setText(String.format("selected(%d)", selectedHashMap.size()));
+        selectedButton.setText(String.format("selected(%d)", sendList.size()));
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {

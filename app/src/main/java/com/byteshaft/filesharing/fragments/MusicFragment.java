@@ -41,12 +41,13 @@ public class MusicFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 CheckBox musicCheckbox = (CheckBox) view.findViewById(R.id.music_checkbox);
                 File file = new File(musicList.get(i));
-                if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                    ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                String filePath = file.getAbsolutePath();
+                if (!ActivitySendFile.sendList.contains(filePath)) {
+                    ActivitySendFile.sendList.add(filePath);
                     musicCheckbox.setChecked(true);
                     musicCheckbox.setVisibility(View.VISIBLE);
                 } else {
-                    ActivitySendFile.selectedHashMap.remove(file.getName());
+                    ActivitySendFile.sendList.remove(filePath);
                     musicCheckbox.setChecked(false);
                     musicCheckbox.setVisibility(View.GONE);
                 }
@@ -121,7 +122,7 @@ public class MusicFragment extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File f = new File(folderList.get(position));
-            if (ActivitySendFile.selectedHashMap.containsKey(f.getName())) {
+            if (ActivitySendFile.sendList.contains(f.getAbsolutePath())) {
                 viewHolder.musicCheckbox.setVisibility(View.VISIBLE);
                 viewHolder.musicCheckbox.setChecked(true);
             } else {

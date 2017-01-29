@@ -43,12 +43,13 @@ public class PhotosFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 CheckBox photoCheckbox = (CheckBox) view.findViewById(R.id.photo_checkbox);
                 File file = new File(photoList.get(i));
-                if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                    ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
+                String filePath = file.getAbsolutePath();
+                if (!ActivitySendFile.sendList.contains(filePath)) {
+                    ActivitySendFile.sendList.add(filePath);
                     photoCheckbox.setChecked(true);
                     photoCheckbox.setVisibility(View.VISIBLE);
                 } else {
-                    ActivitySendFile.selectedHashMap.remove(file.getName());
+                    ActivitySendFile.sendList.remove(filePath);
                     photoCheckbox.setChecked(false);
                     photoCheckbox.setVisibility(View.GONE);
                 }
@@ -118,7 +119,7 @@ public class PhotosFragment extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File f = new File(folderList.get(position));
-            if (ActivitySendFile.selectedHashMap.containsKey(f.getName())) {
+            if (ActivitySendFile.sendList.contains(f.getAbsolutePath())) {
                 viewHolder.photoCheckBox.setVisibility(View.VISIBLE);
                 viewHolder.photoCheckBox.setChecked(true);
             } else {

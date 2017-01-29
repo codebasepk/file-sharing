@@ -25,8 +25,6 @@ import com.byteshaft.filesharing.utils.Helpers;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final int RESULT_LOAD_IMAGE = 10;
-    private Button buttonSend;
-    private Button buttonReceive;
     private static final int READ_STORAGE_PERMISSION = 0;
     private static final int WRITE_STORAGE_PERMISSION = 1;
     EditText mUsername;
@@ -36,8 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buttonSend = (Button) findViewById(R.id.button_send);
-        buttonReceive = (Button) findViewById(R.id.button_receive);
+        Button buttonSend = (Button) findViewById(R.id.button_send);
+        Button buttonReceive = (Button) findViewById(R.id.button_receive);
         buttonSend.setOnClickListener(this);
         buttonReceive.setOnClickListener(this);
         if (!Application.isRunningFirstTime()) {
