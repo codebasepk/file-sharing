@@ -48,9 +48,7 @@ import static com.byteshaft.filesharing.utils.Helpers.intToInetAddress;
 import static com.byteshaft.filesharing.utils.Helpers.locationEnabled;
 
 public class PlaceholderPeersActivity extends AppCompatActivity implements View.OnClickListener {
-    private String mFilePath;
-    private String mFileType;
-    private String mPort;
+    private ScanResult mPeer;
     private boolean mConnectionRequested;
     private boolean mScanRequested;
     private WifiManager mWifiManager;
@@ -58,7 +56,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     private FrameLayout radarLayout;
     private static final int PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION = 0;
     private HashMap<Integer, ScanResult> mResults = new HashMap<>();
-    private int sendCounter = 0;
     private ImageButton mRefreshButton;
     private static final int LOCATION_OFF = 0;
 
@@ -160,7 +157,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         try {
             unregisterReceiver(wifiStateReceiver);
             unregisterReceiver(mWifiScanReceiver);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException ignore) {
 
         }
     }
@@ -218,13 +215,48 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 if (view instanceof ImageButton) {
                     Log.i("TAG", "true");
                     Log.i("TAG", "id " + view.getId());
-                    ScanResult peer = mResults.get(view.getId());
-                    for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
-                        processClick(peer, new File(fileItem.get("path")), fileItem.get("type"));
+                    mPeer = mResults.get(view.getId());
+                    if (!mWifiManager.getConnectionInfo().getSSID().contains(mPeer.SSID)) {
+                        System.out.println(String.format("Not connected to %s, trying to connect", mPeer.SSID));
+                        connectToSSID(mPeer.SSID);
+                    } else {
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String hostIP = intToInetAddress(
+                                        mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
+                                for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
+                                    sendFileOverNetwork(
+                                            hostIP,
+                                            Helpers.decodeString(mPeer.SSID.split("-")[2]),
+                                            new File(fileItem.get("path")).getAbsolutePath(),
+                                            fileItem.get("type")
+                                    );
+                                }
+                            }
+                        }).start();
                     }
                 }
             }
         });
+    }
+
+    private void connectToSSID(String SSID) {
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + SSID + "\"";
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        wifiManager.addNetwork(conf);
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+                mConnectionRequested = true;
+                break;
+            }
+        }
     }
 
     @Override
@@ -246,44 +278,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         }
     }
 
-    protected void processClick(ScanResult device, final File fileToSend, final String fileType) {
-        mFilePath = fileToSend.getAbsolutePath();
-        mFileType = fileType;
-        mPort = Helpers.decodeString(device.SSID.split("-")[2]);
-        if (mWifiManager.getConnectionInfo().getSSID().contains(device.SSID)) {
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    System.out.println("Current SSID: " + mWifiManager.getConnectionInfo().getSSID());
-                    String hostIP = intToInetAddress(
-                            mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                    sendFileOverNetwork(hostIP, mPort, mFilePath, mFileType);
-                }
-            }).start();
-        } else {
-            WifiConfiguration conf = new WifiConfiguration();
-            conf.SSID = "\"" + device.SSID + "\"";
-            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-            wifiManager.addNetwork(conf);
-            List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-            for (WifiConfiguration i : list) {
-                if (i.SSID != null && i.SSID.equals("\"" + device.SSID + "\"")) {
-                    wifiManager.disconnect();
-                    wifiManager.enableNetwork(i.networkId, true);
-                    wifiManager.reconnect();
-                    mConnectionRequested = true;
-                    break;
-                }
-            }
-        }
-    }
-
     @WorkerThread
     public static void sendFileOverNetwork(String hostIP, String port, String filePath,
                                            String fileType) {
-        System.out.println(hostIP);
-        System.out.println(port);
         try {
             Socket sock = new Socket(hostIP, Integer.valueOf(port));
             File myFile = new File(filePath);
@@ -328,7 +325,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                 if (ConnectivityManager.TYPE_WIFI == networkInfo.getType() &&
                         networkInfo.isConnected() && mConnectionRequested) {
-                    System.out.println(mWifiManager.getConnectionInfo().getSSID());
                     mConnectionRequested = false;
                     new Thread(new Runnable() {
                         @Override
@@ -338,10 +334,16 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            System.out.println("Current SSID: " + mWifiManager.getConnectionInfo().getSSID());
                             String hostIP = intToInetAddress(
                                     mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                            sendFileOverNetwork(hostIP, mPort, mFilePath, mFileType);
+                            for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
+                                sendFileOverNetwork(
+                                        hostIP,
+                                        Helpers.decodeString(mPeer.SSID.split("-")[2]),
+                                        new File(fileItem.get("path")).getAbsolutePath(),
+                                        fileItem.get("type")
+                                );
+                            }
                         }
                     }).start();
                 }
