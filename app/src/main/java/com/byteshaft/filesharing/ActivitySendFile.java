@@ -22,11 +22,8 @@ import java.util.HashMap;
 
 public class ActivitySendFile extends AppCompatActivity {
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
     public static HashMap<String, String> selectedHashMap;
     private Button selectedButton;
-    private Button nextButton;
     private static ActivitySendFile sInstance;
 
     public static ActivitySendFile getInstance() {
@@ -39,14 +36,14 @@ public class ActivitySendFile extends AppCompatActivity {
         setContentView(R.layout.activity_send_file);
         sInstance = this;
         selectedHashMap = new HashMap<>();
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         selectedButton = (Button) findViewById(R.id.selected);
-        nextButton = (Button) findViewById(R.id.next);
+        Button nextButton = (Button) findViewById(R.id.next);
         selectedButton.setText("Selected");
         setSelection();
         nextButton.setOnClickListener(new View.OnClickListener() {

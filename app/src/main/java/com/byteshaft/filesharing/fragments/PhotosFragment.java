@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,7 +26,6 @@ import java.util.ArrayList;
 
 public class PhotosFragment extends Fragment {
 
-    private GridView gridLayout;
     private ArrayList<String> photoList;
     private Adapter adapter;
 
@@ -36,22 +34,23 @@ public class PhotosFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.photos_fragment, container, false);
         photoList = new ArrayList<>();
-        gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
+        GridView gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_photo_fragment, photoList);
         gridLayout.setAdapter(adapter);
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CheckBox photoCheckbox = (CheckBox) view.findViewById(R.id.photo_checkbox);
                 File file = new File(photoList.get(i));
                 if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
                     ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
-                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setChecked(true);
-                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setVisibility(View.VISIBLE);
+                    photoCheckbox.setChecked(true);
+                    photoCheckbox.setVisibility(View.VISIBLE);
                 } else {
                     ActivitySendFile.selectedHashMap.remove(file.getName());
-                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setChecked(false);
-                    ((CheckBox) view.findViewById(R.id.photo_checkbox)).setVisibility(View.GONE);
+                    photoCheckbox.setChecked(false);
+                    photoCheckbox.setVisibility(View.GONE);
                 }
                 ActivitySendFile.getInstance().setSelection();
             }
@@ -77,8 +76,8 @@ public class PhotosFragment extends Fragment {
     public  void getAllShownImages() {
         Uri uri;
         Cursor cursor;
-        int column_index_data, column_index_folder_name;
-        String absolutePathOfImage = null;
+        int column_index_data;
+        String absolutePathOfImage;
         uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = { MediaStore.MediaColumns.DATA,
@@ -88,11 +87,8 @@ public class PhotosFragment extends Fragment {
                 null,  MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
-        column_index_folder_name = cursor
-                .getColumnIndexOrThrow(MediaStore.Images.Media.BUCKET_DISPLAY_NAME);
         while (cursor.moveToNext()) {
             absolutePathOfImage = cursor.getString(column_index_data);
-            File file = new File(absolutePathOfImage);
             if (!photoList.contains(absolutePathOfImage)) {
                 photoList.add(absolutePathOfImage);
                 adapter.notifyDataSetChanged();
@@ -105,7 +101,7 @@ public class PhotosFragment extends Fragment {
         private ArrayList<String> folderList;
         private ViewHolder viewHolder;
 
-        public Adapter(Context context, int resource, ArrayList<String> folderList) {
+        Adapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
             this.folderList = folderList;
         }
