@@ -49,6 +49,7 @@ import static com.byteshaft.filesharing.utils.Helpers.locationEnabled;
 
 public class PlaceholderPeersActivity extends AppCompatActivity implements View.OnClickListener {
     private String mFilePath;
+    private String mFileType;
     private String mPort;
     private boolean mConnectionRequested;
     private boolean mScanRequested;
@@ -218,8 +219,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     Log.i("TAG", "true");
                     Log.i("TAG", "id " + view.getId());
                     ScanResult peer = mResults.get(view.getId());
-                    for (String filePath : ActivitySendFile.sendList) {
-                        processClick(peer, new File(filePath));
+                    for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
+                        processClick(peer, new File(fileItem.get("path")), fileItem.get("type"));
                     }
                 }
             }
@@ -245,18 +246,18 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         }
     }
 
-    protected void processClick(ScanResult device, final File fileToSend) {
+    protected void processClick(ScanResult device, final File fileToSend, final String fileType) {
         mFilePath = fileToSend.getAbsolutePath();
+        mFileType = fileType;
         mPort = Helpers.decodeString(device.SSID.split("-")[2]);
         if (mWifiManager.getConnectionInfo().getSSID().contains(device.SSID)) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
+                    System.out.println("Current SSID: " + mWifiManager.getConnectionInfo().getSSID());
                     String hostIP = intToInetAddress(
                             mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                    Log.i("TAG", " counter " + sendCounter);
-
-                    sendFileOverNetwork(hostIP, mPort, mFilePath);
+                    sendFileOverNetwork(hostIP, mPort, mFilePath, mFileType);
                 }
             }).start();
         } else {
@@ -279,7 +280,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     }
 
     @WorkerThread
-    public static void sendFileOverNetwork(String hostIP, String port, String filePath) {
+    public static void sendFileOverNetwork(String hostIP, String port, String filePath,
+                                           String fileType) {
         System.out.println(hostIP);
         System.out.println(port);
         try {
@@ -294,7 +296,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(getMetadata(myFile.getName(), myFile.length()));
+            dos.writeUTF(getMetadata(myFile.getName(), fileType, myFile.length()));
             dos.writeLong(fileBytesArray.length);
             dos.write(fileBytesArray, 0, fileBytesArray.length);
             dos.flush();
@@ -306,11 +308,12 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         }
     }
 
-    private static String getMetadata(String name, long size) {
+    private static String getMetadata(String name, String type, long size) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("name", name);
             obj.put("size", size);
+            obj.put("type", type);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -330,15 +333,15 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            String hostIP = intToInetAddress(
-                                    mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
                             try {
                                 Thread.sleep(10000);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            System.out.println("Waited and now trying to send");
-                            sendFileOverNetwork(hostIP, mPort, mFilePath);
+                            System.out.println("Current SSID: " + mWifiManager.getConnectionInfo().getSSID());
+                            String hostIP = intToInetAddress(
+                                    mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
+                            sendFileOverNetwork(hostIP, mPort, mFilePath, mFileType);
                         }
                     }).start();
                 }

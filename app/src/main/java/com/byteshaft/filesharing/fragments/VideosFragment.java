@@ -18,10 +18,12 @@ import android.widget.ImageView;
 
 import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.ThumbnailCreationTask;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class VideosFragment extends Fragment {
 
@@ -49,8 +51,10 @@ public class VideosFragment extends Fragment {
                 CheckBox videosCheckbox = (CheckBox) view.findViewById(R.id.videos_checkbox);
                 File file = new File(videoList.get(i));
                 String filePath = file.getAbsolutePath();
-                    if (!ActivitySendFile.sendList.contains(filePath)) {
-                        ActivitySendFile.sendList.add(filePath);
+                HashMap<String, String> fileItem = Helpers.getFileMetadataMap(
+                        file.getAbsolutePath(), "videos");
+                    if (!ActivitySendFile.sendList.containsKey(filePath)) {
+                        ActivitySendFile.sendList.put(filePath, fileItem);
                         videosCheckbox.setChecked(true);
                         videosCheckbox.setVisibility(View.VISIBLE);
                     } else {
@@ -127,7 +131,7 @@ public class VideosFragment extends Fragment {
             }
             File file = new File(folderList.get(position));
             new ThumbnailCreationTask(getActivity().getApplicationContext(), viewHolder, position).execute();
-            if (ActivitySendFile.sendList.contains(file.getAbsolutePath())) {
+            if (ActivitySendFile.sendList.containsKey(file.getAbsolutePath())) {
                 viewHolder.checkbox.setVisibility(View.VISIBLE);
                 viewHolder.checkbox.setChecked(true);
             } else {

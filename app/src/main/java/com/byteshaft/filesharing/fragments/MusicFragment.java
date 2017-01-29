@@ -17,9 +17,11 @@ import android.widget.TextView;
 
 import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.utils.Helpers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class MusicFragment extends Fragment {
@@ -42,8 +44,10 @@ public class MusicFragment extends Fragment {
                 CheckBox musicCheckbox = (CheckBox) view.findViewById(R.id.music_checkbox);
                 File file = new File(musicList.get(i));
                 String filePath = file.getAbsolutePath();
-                if (!ActivitySendFile.sendList.contains(filePath)) {
-                    ActivitySendFile.sendList.add(filePath);
+                HashMap<String, String> fileItem = Helpers.getFileMetadataMap(
+                        file.getAbsolutePath(), "music");
+                if (!ActivitySendFile.sendList.containsKey(filePath)) {
+                    ActivitySendFile.sendList.put(filePath, fileItem);
                     musicCheckbox.setChecked(true);
                     musicCheckbox.setVisibility(View.VISIBLE);
                 } else {
@@ -122,7 +126,7 @@ public class MusicFragment extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File f = new File(folderList.get(position));
-            if (ActivitySendFile.sendList.contains(f.getAbsolutePath())) {
+            if (ActivitySendFile.sendList.containsKey(f.getAbsolutePath())) {
                 viewHolder.musicCheckbox.setVisibility(View.VISIBLE);
                 viewHolder.musicCheckbox.setChecked(true);
             } else {

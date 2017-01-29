@@ -17,12 +17,12 @@ import com.byteshaft.filesharing.fragments.MusicFragment;
 import com.byteshaft.filesharing.fragments.PhotosFragment;
 import com.byteshaft.filesharing.fragments.VideosFragment;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class ActivitySendFile extends AppCompatActivity {
 
-    public static ArrayList<String> sendList;
+    public static HashMap<String, HashMap<String, String>> sendList;
     private Button selectedButton;
     private static ActivitySendFile sInstance;
 
@@ -35,7 +35,7 @@ public class ActivitySendFile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_file);
         sInstance = this;
-        sendList = new ArrayList<>();
+        sendList = new HashMap<>();
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
         ViewPager mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);

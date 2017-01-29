@@ -20,9 +20,11 @@ import android.widget.TextView;
 
 import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.utils.Helpers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FilesFragment extends Fragment {
 
@@ -52,19 +54,23 @@ public class FilesFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 CheckBox selectionCheckbox = (CheckBox) view.findViewById(R.id.selectionCheckbox);
                 File file = null;
+                HashMap<String, String> fileItem = null;
                 if (selectedFolder == 0) {
                     file = new File(documentList.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "documents");
                 } else if (selectedFolder == 1) {
                     file = new File(zipList.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "zips");
                 } else if (selectedFolder == 2) {
                     file = new File(eBook.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "ebooks");
                 }
                 if (file == null) {
                     return;
                 }
                 String filePath = file.getAbsolutePath();
-                if (!ActivitySendFile.sendList.contains(filePath)) {
-                    ActivitySendFile.sendList.add(filePath);
+                if (!ActivitySendFile.sendList.containsKey(filePath)) {
+                    ActivitySendFile.sendList.put(filePath, fileItem);
                     selectionCheckbox.setChecked(true);
                     selectionCheckbox.setVisibility(View.VISIBLE);
                 } else {
@@ -197,7 +203,7 @@ public class FilesFragment extends Fragment {
             File file = new File(folderList.get(position));
             filesHolder.fileName.setText(file.getName());
             filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(),file.length()));
-            if (ActivitySendFile.sendList.contains(file.getAbsolutePath())) {
+            if (ActivitySendFile.sendList.containsKey(file.getAbsolutePath())) {
                 filesHolder.mCheckBox.setVisibility(View.VISIBLE);
                 filesHolder.mCheckBox.setChecked(true);
             } else {
