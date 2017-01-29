@@ -5,7 +5,6 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,17 +17,15 @@ import android.widget.TextView;
 
 import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.utils.Helpers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-/**
- * Created by shahid on 17/01/2017.
- */
 
 public class MusicFragment extends Fragment {
 
-    private GridView gridLayout;
     private ArrayList<String> musicList;
     private Adapter adapter;
 
@@ -37,22 +34,26 @@ public class MusicFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.music_fragment, container, false);
         musicList = new ArrayList<>();
-        gridLayout = (GridView) rootView.findViewById(R.id.music_grid);
+        GridView gridLayout = (GridView) rootView.findViewById(R.id.music_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_photo_fragment, musicList);
         gridLayout.setAdapter(adapter);
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CheckBox musicCheckbox = (CheckBox) view.findViewById(R.id.music_checkbox);
                 File file = new File(musicList.get(i));
-                if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                    ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
-                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setChecked(true);
-                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setVisibility(View.VISIBLE);
+                String filePath = file.getAbsolutePath();
+                HashMap<String, String> fileItem = Helpers.getFileMetadataMap(
+                        file.getAbsolutePath(), "music");
+                if (!ActivitySendFile.sendList.containsKey(filePath)) {
+                    ActivitySendFile.sendList.put(filePath, fileItem);
+                    musicCheckbox.setChecked(true);
+                    musicCheckbox.setVisibility(View.VISIBLE);
                 } else {
-                    ActivitySendFile.selectedHashMap.remove(file.getName());
-                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setChecked(false);
-                    ((CheckBox) view.findViewById(R.id.music_checkbox)).setVisibility(View.GONE);
+                    ActivitySendFile.sendList.remove(filePath);
+                    musicCheckbox.setChecked(false);
+                    musicCheckbox.setVisibility(View.GONE);
                 }
                 ActivitySendFile.getInstance().setSelection();
 
@@ -107,7 +108,7 @@ public class MusicFragment extends Fragment {
         private ArrayList<String> folderList;
         private ViewHolder viewHolder;
 
-        public Adapter(Context context, int resource, ArrayList<String> folderList) {
+        Adapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
             this.folderList = folderList;
         }
@@ -125,7 +126,7 @@ public class MusicFragment extends Fragment {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File f = new File(folderList.get(position));
-            if (ActivitySendFile.selectedHashMap.containsKey(f.getName())) {
+            if (ActivitySendFile.sendList.containsKey(f.getAbsolutePath())) {
                 viewHolder.musicCheckbox.setVisibility(View.VISIBLE);
                 viewHolder.musicCheckbox.setChecked(true);
             } else {

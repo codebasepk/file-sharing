@@ -1,26 +1,18 @@
 package com.byteshaft.filesharing.utils;
 
-import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.WorkerThread;
 import android.util.Base64;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 
 public class Helpers {
     public static String generateSSID(String identifier, String port) {
@@ -92,5 +84,12 @@ public class Helpers {
             e.printStackTrace();
         }
         return text;
+    }
+
+    public static HashMap<String, String> getFileMetadataMap(String path, String type) {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("path", path);
+        map.put("type", type);
+        return map;
     }
 }

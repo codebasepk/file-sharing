@@ -7,7 +7,6 @@ import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
-import android.webkit.MimeTypeMap;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,8 +36,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private String user;
     private Hotspot mHotspot;
     PulsatorLayout pulsator;
-    // FIXME: Make this configurable by user, must be >= 10 characters.
-    private final String USERNAME = "testing123";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,11 +95,18 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     DataInputStream clientData = new DataInputStream(in);
                     String metadata = clientData.readUTF();
                     JSONObject jsonObject = new JSONObject(metadata);
-                    final File f = new File(
-                            Environment.getExternalStorageDirectory() + "/" + jsonObject.optString("name"));
-                    String fileType = getMimeType(f.getAbsolutePath());
-                    System.out.println(fileType);
-                    OutputStream output = new FileOutputStream(f);
+                    File mainDirectory = new File(
+                            Environment.getExternalStorageDirectory()
+                                    + File.separator
+                                    + "FileShare"
+                                    + File.separator
+                                    + jsonObject.optString("type"));
+                    if (!mainDirectory.exists()) {
+                        mainDirectory.mkdirs();
+                    }
+                    final File outputFile = new File(
+                            mainDirectory.getAbsolutePath() + "/" + jsonObject.optString("name"));
+                    OutputStream output = new FileOutputStream(outputFile);
                     long size = clientData.readLong();
                     byte[] buffer = new byte[8192];
                     while (size > 0 && (bytesRead = clientData.read(
@@ -116,7 +120,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         public void run() {
                             Toast.makeText(
                                     getApplicationContext(),
-                                    f.getAbsolutePath(),
+                                    outputFile.getAbsolutePath(),
                                     Toast.LENGTH_SHORT
                             ).show();
                         }
@@ -129,13 +133,4 @@ public class ActivityReceiveFile extends AppCompatActivity {
             }
         }
     });
-
-    public static String getMimeType(String url) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-        if (extension != null) {
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        }
-        return type;
-    }
 }
