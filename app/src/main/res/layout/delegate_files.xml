@@ -17,7 +17,7 @@
     <TextView
         android:id="@+id/file_uri"
         android:textStyle="italic"
-        android:textSize="14sp"
+        android:textSize="12sp"
         android:layout_below="@+id/file_name"
         android:textColor="@color/background_color"
         android:padding="5dp"

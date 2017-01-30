@@ -13,10 +13,11 @@ import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import pl.bclogic.pulsator4droid.library.PulsatorLayout;
+
 
 /**
  * Created by s9iper1 on 1/30/17.
@@ -34,11 +35,11 @@ public class SendProgressActivity extends PlaceholderPeersActivity{
         listView = (ListView) findViewById(R.id.list_view);
         file = new ArrayList<>();
         Iterator entries = ActivitySendFile.sendList.entrySet().iterator();
+        Log.i("TAG", "hashmap " + ActivitySendFile.sendList);
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Object key = thisEntry.getKey();
-            file.add(String.valueOf(key));
-            // ...
+            file.add(key.toString());
         }
         Adapter adapter = new Adapter(getApplicationContext(), R.layout.delegate_files, file);
         listView.setAdapter(adapter);
@@ -66,9 +67,8 @@ public class SendProgressActivity extends PlaceholderPeersActivity{
             }else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            File file = new File(String.valueOf(ActivitySendFile.sendList.get(
-                    toBeSend.get(position).replace("{", "").replace("}", ""))));
-            Log.i("TAG", "file " + file.toString());
+            File file = new File(toBeSend.get(position));
+            Log.i("TAG", "file " + toBeSend.get(position));
             viewHolder.fileName.setText(file.getName());
             viewHolder.fileUri.setText(file.toString());
             return convertView;
