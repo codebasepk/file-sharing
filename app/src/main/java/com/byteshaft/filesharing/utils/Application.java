@@ -27,7 +27,7 @@ public class Application extends android.app.Application {
 
     public static boolean isRunningFirstTime() {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean(Application.FIRTS_TIME_KEY, false);
+        return sharedPreferences.getBoolean(Application.FIRTS_TIME_KEY, true);
     }
 
     public static SharedPreferences getPreferenceManager() {

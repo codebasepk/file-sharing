@@ -40,9 +40,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonReceive = (Button) findViewById(R.id.button_receive);
         buttonSend.setOnClickListener(this);
         buttonReceive.setOnClickListener(this);
-        if (!Application.isRunningFirstTime()) {
+        if (Application.isRunningFirstTime()) {
             showDialog();
-            Application.saveBoolean(true);
+            Application.saveBoolean(false);
         }
     }
 
