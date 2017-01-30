@@ -19,7 +19,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.byteshaft.filesharing.utils.Application;
+import com.byteshaft.filesharing.utils.AppGlobals;
 import com.byteshaft.filesharing.utils.Helpers;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
@@ -38,9 +38,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Button buttonReceive = (Button) findViewById(R.id.button_receive);
         buttonSend.setOnClickListener(this);
         buttonReceive.setOnClickListener(this);
-        if (Application.isRunningFirstTime()) {
+        if (AppGlobals.isRunningFirstTime()) {
             showDialog();
-            Application.saveBoolean(false);
+            AppGlobals.saveBoolean(false);
         }
     }
 

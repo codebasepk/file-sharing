@@ -65,9 +65,28 @@ public class Hotspot {
 //            int apstate = (Integer) getWifiApStateMethod.invoke(mWifiManager);
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause().getMessage().contains("android.permission.CONNECTIVITY_INTERNAL")) {
-                Application.setIsReceiveSupported(false);
+                AppGlobals.setIsReceiveSupported(false);
             }
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void createForM(String name) {
+        try {
+            WifiManager wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(Context.WIFI_SERVICE);
+            Method getConfigMethod = wifiManager.getClass().getMethod("getWifiApConfiguration");
+            WifiConfiguration wifiConfig = (WifiConfiguration) getConfigMethod.invoke(wifiManager);
+
+            wifiConfig.SSID = name;
+            wifiConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+            wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+            Method setConfigMethod = wifiManager.getClass().getMethod("setWifiApConfiguration", WifiConfiguration.class);
+            setConfigMethod.invoke(wifiManager, wifiConfig);
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
     }
