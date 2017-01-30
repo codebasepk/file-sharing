@@ -10,10 +10,10 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
 import com.github.siyamed.shapeimageview.CircularImageView;
@@ -46,7 +46,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private ProgressDialog pDialog;
     public static final int progress_bar_type = 0;
 
-    private ProgressBar mProgressBar;
+    private RoundCornerProgressBar mProgressBar;
     private FrameLayout progressLayout;
     private TextView percentAge;
     private TextView uploadDetails;
@@ -60,7 +60,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
         setContentView(R.layout.activity_receive_file);
 
         uploadDetails = (TextView) findViewById(R.id.file_number);
-        mProgressBar = (ProgressBar) findViewById(R.id.progressbar_Horizontal);
+        mProgressBar = (RoundCornerProgressBar) findViewById(R.id.progressbar_Horizontal);
         progressLayout = (FrameLayout) findViewById(R.id.progress_layout);
         percentAge = (TextView) findViewById(R.id.percentage);
 
@@ -161,7 +161,12 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                     jsonObject.optString("currentFileNumber") + "/" + jsonObject.optString("filesCount"));
                         }
                     });
-                    mProgressBar.setMax(100);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mProgressBar.setMax(100);
+                        }
+                    });
                     while (size > 0 && (bytesRead = clientData.read(
                             buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
                         output.write(buffer, 0, bytesRead);
@@ -170,7 +175,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mProgressBar.setProgress((int)((float)mSent/mSize*100));
+                                mProgressBar.setProgress((int) ((float) mSent / mSize * 100));
                             }
                         });
                     }

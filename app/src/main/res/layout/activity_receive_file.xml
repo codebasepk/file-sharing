@@ -62,11 +62,6 @@
         android:background="@color/background_color"
         android:visibility="visible">
 
-        <View
-            android:layout_width="fill_parent"
-            android:layout_height="2dp"
-            android:background="#000" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -80,14 +75,16 @@
                 android:textSize="14sp"
                 android:textStyle="bold" />
 
-            <ProgressBar
+            <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
                 android:id="@+id/progressbar_Horizontal"
-                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
-                android:layout_margin="4dp"
-                android:layout_height="15dp"
-                android:max="100"
-                android:progress="0" />
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                app:rcBackgroundColor="#303F9F"
+                app:rcBackgroundPadding="5dp"
+                app:rcProgressColor="#4CAF50"
+                app:rcRadius="4dp"
+                app:rcReverse="false" />
 
             <TextView
                 android:id="@+id/percentage"

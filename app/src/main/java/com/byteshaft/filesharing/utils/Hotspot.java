@@ -3,8 +3,6 @@ package com.byteshaft.filesharing.utils;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.lang.reflect.Method;
