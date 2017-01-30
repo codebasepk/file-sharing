@@ -23,6 +23,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -125,7 +126,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case LOCATION_OFF:
                 if (locationEnabled()) {
                     mWifiManager.startScan();
@@ -196,18 +197,25 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         LinearLayout.LayoutParams params = new LinearLayout
                 .LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT);
+        
         layout.setLayoutParams(params);
         ImageButton imageView = new ImageButton(getApplicationContext());
         imageView.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         imageView.setId(index);
+        int width = 80;
+        int height = 80;
+        LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(width,height);
+        imageView.setLayoutParams(parms);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setImageResource(R.mipmap.ic_launcher);
+        imageView.requestLayout();
         TextView textView = new TextView(getApplicationContext());
         String[] ssidData = result.SSID.split("-");
         textView.setText(Helpers.decodeString(ssidData[1]));
         layout.addView(imageView);
         layout.addView(textView);
-        layout.setX(10);
-        layout.setY(10);
+        layout.setX(18);
+        layout.setY(18);
         radarLayout.addView(layout);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -225,12 +233,16 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                             public void run() {
                                 String hostIP = intToInetAddress(
                                         mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
+                                int count = 0;
                                 for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
+                                    count++;
                                     sendFileOverNetwork(
                                             hostIP,
                                             Helpers.decodeString(mPeer.SSID.split("-")[2]),
                                             new File(fileItem.get("path")).getAbsolutePath(),
-                                            fileItem.get("type")
+                                            fileItem.get("type"),
+                                            count,
+                                            ActivitySendFile.sendList.size()
                                     );
                                 }
                             }
@@ -280,7 +292,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
 
     @WorkerThread
     public static void sendFileOverNetwork(String hostIP, String port, String filePath,
-                                           String fileType) {
+                                           String fileType, int currentFile, int filesCount) {
         try {
             Socket sock = new Socket(hostIP, Integer.valueOf(port));
             File myFile = new File(filePath);
@@ -293,7 +305,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
 
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(getMetadata(myFile.getName(), fileType, myFile.length()));
+            dos.writeUTF(
+                    getMetadata(
+                            myFile.getName(), fileType, myFile.length(), currentFile, filesCount));
             dos.writeLong(fileBytesArray.length);
             dos.write(fileBytesArray, 0, fileBytesArray.length);
             dos.flush();
@@ -305,12 +319,15 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         }
     }
 
-    private static String getMetadata(String name, String type, long size) {
+    private static String getMetadata(
+            String name, String type, long size, int currentFileNumber, int filesCount) {
         JSONObject obj = new JSONObject();
         try {
             obj.put("name", name);
-            obj.put("size", size);
+            obj.put("size", String.valueOf(size));
             obj.put("type", type);
+            obj.put("filesCount", String.valueOf(filesCount));
+            obj.put("currentFileNumber", String.valueOf(currentFileNumber));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -329,6 +346,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
+                            int count = 0;
                             try {
                                 Thread.sleep(10000);
                             } catch (InterruptedException e) {
@@ -337,11 +355,14 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                             String hostIP = intToInetAddress(
                                     mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
                             for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
+                                count++;
                                 sendFileOverNetwork(
                                         hostIP,
                                         Helpers.decodeString(mPeer.SSID.split("-")[2]),
                                         new File(fileItem.get("path")).getAbsolutePath(),
-                                        fileItem.get("type")
+                                        fileItem.get("type"),
+                                        count,
+                                        ActivitySendFile.sendList.size()
                                 );
                             }
                         }

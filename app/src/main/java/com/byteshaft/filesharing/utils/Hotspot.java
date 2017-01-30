@@ -3,6 +3,8 @@ package com.byteshaft.filesharing.utils;
 import android.content.Context;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.lang.reflect.Method;
@@ -30,7 +32,7 @@ public class Hotspot {
     public boolean isCreated() {
         try {
             Method getWifiApConfigurationMethod = mWifiManager.getClass().getMethod("getWifiApConfiguration");
-            WifiConfiguration netConfig = (WifiConfiguration)getWifiApConfigurationMethod.invoke(mWifiManager);
+            WifiConfiguration netConfig = (WifiConfiguration) getWifiApConfigurationMethod.invoke(mWifiManager);
             return netConfig.SSID.equals(mName);
         } catch (Exception e) {
             return false;
@@ -59,11 +61,16 @@ public class Hotspot {
             Method setWifiApMethod = mWifiManager.getClass().getMethod(
                     "setWifiApEnabled", WifiConfiguration.class, boolean.class);
             mCreated = (boolean) (Boolean) setWifiApMethod.invoke(mWifiManager, netConfig, true);
-            while (!isAPCreated()) {}
+            while (!isAPCreated()) {
+            }
 //            Method getWifiApStateMethod = mWifiManager.getClass().getMethod("getWifiApState");
 //            int apstate = (Integer) getWifiApStateMethod.invoke(mWifiManager);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause().getMessage().contains("android.permission.CONNECTIVITY_INTERNAL")) {
+                Application.setIsReceiveSupported(false);
+            }
         } catch (Exception e) {
-            Log.e("HOTSPOT", "", e);
+            e.printStackTrace();
         }
     }
 
