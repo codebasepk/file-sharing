@@ -45,6 +45,7 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
 
+import static android.R.attr.data;
 import static com.byteshaft.filesharing.utils.Helpers.intToInetAddress;
 import static com.byteshaft.filesharing.utils.Helpers.locationEnabled;
 
@@ -77,11 +78,17 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
             //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
         } else {
-            if (locationEnabled()) {
+            if (locationEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mWifiManager.startScan();
                 mRadarView = (RadarView) findViewById(R.id.radarView);
                 mRadarView.setShowCircles(true);
                 startAnimation(mRadarView);
+            } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                mWifiManager.startScan();
+                mRadarView = (RadarView) findViewById(R.id.radarView);
+                mRadarView.setShowCircles(true);
+                startAnimation(mRadarView);
+
             } else {
                 Toast.makeText(this, "location not enabled", Toast.LENGTH_SHORT).show();
                 AlertDialog.Builder dialog = new AlertDialog.Builder(this);
@@ -115,10 +122,33 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         if (requestCode == PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             // Do something with granted permission
-            if (locationEnabled()) {
+
+            if (locationEnabled() || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 mWifiManager.startScan();
             } else {
-                Toast.makeText(this, "location not enabled", Toast.LENGTH_SHORT).show();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    Toast.makeText(this, "location not enabled", Toast.LENGTH_SHORT).show();
+                    AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+                    dialog.setMessage("Location is not enabled");
+                    dialog.setPositiveButton("Turn on", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            // TODO Auto-generated method stub
+                            Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivityForResult(myIntent, LOCATION_OFF);
+                            //get gps
+                        }
+                    });
+                    dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+
+                        @Override
+                        public void onClick(DialogInterface paramDialogInterface, int paramInt) {
+                            // TODO Auto-generated method stub
+
+                        }
+                    });
+                    dialog.show();
+                }
             }
         }
     }
@@ -221,6 +251,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             @Override
             public void onClick(View view) {
                 if (view instanceof ImageButton) {
+                    startActivity(new Intent(getApplicationContext(), SendProgressActivity.class));
                     Log.i("TAG", "true");
                     Log.i("TAG", "id " + view.getId());
                     mPeer = mResults.get(view.getId());

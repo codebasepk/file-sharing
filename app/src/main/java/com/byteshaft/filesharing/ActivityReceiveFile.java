@@ -41,8 +41,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private String user;
     private Hotspot mHotspot;
     private PulsatorLayout pulsator;
-
-
     private ProgressDialog pDialog;
     public static final int progress_bar_type = 0;
 
