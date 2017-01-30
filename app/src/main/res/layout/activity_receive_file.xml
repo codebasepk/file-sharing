@@ -59,7 +59,7 @@
         android:layout_width="match_parent"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
-        android:background="@color/background_color"
+        android:background="@null"
         android:visibility="visible">
 
         <LinearLayout
@@ -80,10 +80,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
-                app:rcBackgroundColor="#303F9F"
+                app:rcBackgroundColor="#BDBDBD"
                 app:rcBackgroundPadding="5dp"
-                app:rcProgressColor="#4CAF50"
-                app:rcRadius="4dp"
+                app:rcSecondaryProgressColor="#00796B"
+                app:rcProgressColor="#009688"
+                app:rcRadius="41dp"
                 app:rcReverse="false" />
 
             <TextView

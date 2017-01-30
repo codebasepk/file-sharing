@@ -72,7 +72,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
         imageView = (CircularImageView) findViewById(R.id.image_view);
         mStatusText = (TextView) findViewById(R.id.tv_status);
         mUserName = (TextView) findViewById(R.id.user_name);
-        mUserName.setText(user);
+        mUserName.setText("Username: " + user);
         mHotspot = new Hotspot(getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -175,6 +175,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                mStatusText.setText("Receiving Files..");
                                 mProgressBar.setProgress((int) ((float) mSent / mSize * 100));
                             }
                         });
@@ -184,6 +185,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            mStatusText.setText("All Done !!");
                             Toast.makeText(
                                     getApplicationContext(),
                                     outputFile.getAbsolutePath(),
