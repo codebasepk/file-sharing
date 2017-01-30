@@ -246,7 +246,9 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         layout.addView(textView);
         layout.setX(18);
         layout.setY(18);
-        radarLayout.addView(layout);
+        if (radarLayout != null) {
+            radarLayout.addView(layout);
+        }
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -28,7 +28,7 @@ public class Helpers {
     }
 
     public static boolean locationEnabled() {
-        LocationManager lm = (LocationManager) Application.getContext()
+        LocationManager lm = (LocationManager) AppGlobals.getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
         boolean gps_enabled = false;
         boolean network_enabled = false;
