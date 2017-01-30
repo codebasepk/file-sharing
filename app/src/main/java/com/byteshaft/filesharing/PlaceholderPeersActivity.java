@@ -308,7 +308,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_refresh_peers:
-//                getListView().setAdapter(null);
                 mScanRequested = true;
                 if (locationEnabled() && ActivityCompat.checkSelfPermission(getApplicationContext(),
                         Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -336,12 +335,25 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             dis.readFully(fileBytesArray, 0, fileBytesArray.length);
             OutputStream os = sock.getOutputStream();
 
+
+            int bytes_read = 0;
+            int bytesReadTotal = 0;
+            int buffer_size = 1024;
+            byte[] buffer = new byte[buffer_size];
+            int progress = 0;
+
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
             dos.writeUTF(
                     getMetadata(
                             myFile.getName(), fileType, myFile.length(), currentFile, filesCount));
             dos.writeLong(fileBytesArray.length);
+//            while ((bytes_read = fis.read(buffer, 0, buffer_size)) > 0) {
+//                dos.write(buffer, 0, bytes_read);
+//                bytesReadTotal += bytes_read;
+//                progress = (int) (100.0f * bytesReadTotal / myFile.length());
+//                Log.i("asd", "direct progress: " + progress);
+//            }
             dos.write(fileBytesArray, 0, fileBytesArray.length);
             dos.flush();
 

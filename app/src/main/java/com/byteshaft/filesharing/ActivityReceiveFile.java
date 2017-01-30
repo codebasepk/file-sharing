@@ -2,18 +2,15 @@ package com.byteshaft.filesharing;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +28,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -46,6 +42,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private String user;
     private Hotspot mHotspot;
     private PulsatorLayout pulsator;
+
+
     private ProgressDialog pDialog;
     public static final int progress_bar_type = 0;
 
@@ -77,64 +75,15 @@ public class ActivityReceiveFile extends AppCompatActivity {
         mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText(user);
         mHotspot = new Hotspot(getApplicationContext());
-//        toggleWifi();
-    }
 
-    private void toggleWifi() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (!Settings.System.canWrite(getApplicationContext())) {
                 startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
                 mNotInitialized = true;
                 return;
             }
-            ServerSocket serverSocket = null;
-            try {
-                serverSocket = new ServerSocket(0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (!isSharingWiFi()) {
-                mHotspot.createForM(Helpers.generateSSID(
-                        user, String.valueOf(serverSocket.getLocalPort())));
-                AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-                alertDialogBuilder.setTitle("Hotspot");
-                alertDialogBuilder.setMessage("Android M or above devices prohibits auto starting " +
-                        "Wifi-Hotspot please set manually.").setCancelable(false)
-                        .setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                dialog.dismiss();
-                                startActivity(new Intent(Settings.ACTION_WIRELESS_SETTINGS));
-                            }
-                        });
-                alertDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        dialogInterface.dismiss();
-                        finish();
-                    }
-                });
-
-                AlertDialog alertDialog = alertDialogBuilder.create();
-                alertDialog.show();
-            }
-        } else {
-            incomingFileRequestThread.start();
         }
-    }
-
-    public boolean isSharingWiFi() {
-        try
-        {
-            WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-            final Method method = wifiManager.getClass().getDeclaredMethod("isWifiApEnabled");
-            method.setAccessible(true); //in the case of visibility change in future APIs
-            return (Boolean) method.invoke(wifiManager);
-        }
-        catch (final Throwable ignored)
-        {
-        }
-
-        return false;
+        incomingFileRequestThread.start();
     }
 
     @Override
@@ -157,7 +106,16 @@ public class ActivityReceiveFile extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        toggleWifi();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Settings.System.canWrite(getApplicationContext())) {
+                if (mNotInitialized) {
+                    incomingFileRequestThread.start();
+                    mNotInitialized = false;
+                }
+            } else {
+                startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
+            }
+        }
     }
 
     @Override
@@ -204,12 +162,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                     jsonObject.optString("currentFileNumber") + "/" + jsonObject.optString("filesCount"));
                         }
                     });
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mProgressBar.setMax(100);
-                        }
-                    });
+                    mProgressBar.setMax(100);
                     while (size > 0 && (bytesRead = clientData.read(
                             buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
                         output.write(buffer, 0, bytesRead);
@@ -218,7 +171,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mProgressBar.setProgress((int) ((float) mSent / mSize * 100));
+                                mProgressBar.setProgress((int)((float)mSent/mSize*100));
                             }
                         });
                     }

@@ -35,7 +35,6 @@ public class SendProgressActivity extends PlaceholderPeersActivity{
         listView = (ListView) findViewById(R.id.list_view);
         file = new ArrayList<>();
         Iterator entries = ActivitySendFile.sendList.entrySet().iterator();
-        Log.i("TAG", "hashmap " + ActivitySendFile.sendList);
         while (entries.hasNext()) {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Object key = thisEntry.getKey();
