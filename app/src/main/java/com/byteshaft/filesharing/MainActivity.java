@@ -25,8 +25,6 @@ import com.byteshaft.filesharing.utils.Helpers;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private final int RESULT_LOAD_IMAGE = 10;
-    private Button buttonSend;
-    private Button buttonReceive;
     private static final int READ_STORAGE_PERMISSION = 0;
     private static final int WRITE_STORAGE_PERMISSION = 1;
     EditText mUsername;
@@ -36,8 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        buttonSend = (Button) findViewById(R.id.button_send);
-        buttonReceive = (Button) findViewById(R.id.button_receive);
+        Button buttonSend = (Button) findViewById(R.id.button_send);
+        Button buttonReceive = (Button) findViewById(R.id.button_receive);
         buttonSend.setOnClickListener(this);
         buttonReceive.setOnClickListener(this);
         if (Application.isRunningFirstTime()) {
@@ -56,14 +54,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     ActivityCompat.requestPermissions(this, new String[]
                             {Manifest.permission.READ_EXTERNAL_STORAGE}, READ_STORAGE_PERMISSION);
                 } else {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-//                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
                     startActivity(new Intent(this, ActivitySendFile.class));
                 }
                 break;
             case R.id.button_receive:
-                System.out.println(
-                );
                 if (ContextCompat.checkSelfPermission(this,
                         Manifest.permission.READ_EXTERNAL_STORAGE)
                         != PackageManager.PERMISSION_GRANTED) {
@@ -84,9 +78,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case READ_STORAGE_PERMISSION:
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                    startActivityForResult(intent, RESULT_LOAD_IMAGE);
-//                    startActivity(new Intent(this, ActivitySendFile.class));
+                    startActivity(new Intent(this, ActivitySendFile.class));
                 } else {
                     Toast.makeText(this, "permission denied!", Toast.LENGTH_SHORT).show();
                 }

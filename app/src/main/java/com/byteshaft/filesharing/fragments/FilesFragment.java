@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.Fragment;
 import android.text.format.Formatter;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,23 +20,22 @@ import android.widget.TextView;
 
 import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.utils.Helpers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FilesFragment extends Fragment {
 
-    private GridView gridLayout;
     private ArrayList<String> folderList;
     private Adapter adapter;
 
-    private FilesAdapter filesAdapter;
     private ListView listView;
     public ArrayList<String> zipList;
     public ArrayList<String> documentList;
     public ArrayList<String> eBook;
     private File path;
-    private FilesHolder filesHolder;
     private int selectedFolder = -1;
 
     @Override
@@ -54,47 +52,40 @@ public class FilesFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                CheckBox selectionCheckbox = (CheckBox) view.findViewById(R.id.selectionCheckbox);
+                File file = null;
+                HashMap<String, String> fileItem = null;
                 if (selectedFolder == 0) {
-                    File file = new File(documentList.get(i));
-                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.VISIBLE);
-                    } else {
-                        ActivitySendFile.selectedHashMap.remove(file.getName());
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(false);
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
-                    }
+                    file = new File(documentList.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "documents");
                 } else if (selectedFolder == 1) {
-                    File file = new File(zipList.get(i));
-                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.VISIBLE);
-                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
-                    } else {
-                        ActivitySendFile.selectedHashMap.remove(file.getName());
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(false);
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
-                    }
+                    file = new File(zipList.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "zips");
                 } else if (selectedFolder == 2) {
-                    File file = new File(eBook.get(i));
-                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(true);
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.VISIBLE);
-                    } else {
-                        ActivitySendFile.selectedHashMap.remove(file.getName());
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setChecked(false);
-                        ((CheckBox) view.findViewById(R.id.selectionCheckbox)).setVisibility(View.GONE);
-                    }
+                    file = new File(eBook.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "ebooks");
                 }
+                if (file == null) {
+                    return;
+                }
+                String filePath = file.getAbsolutePath();
+                if (!ActivitySendFile.sendList.containsKey(filePath)) {
+                    ActivitySendFile.sendList.put(filePath, fileItem);
+                    selectionCheckbox.setChecked(true);
+                    selectionCheckbox.setVisibility(View.VISIBLE);
+                } else {
+                    ActivitySendFile.sendList.remove(filePath);
+                    selectionCheckbox.setChecked(false);
+                    selectionCheckbox.setVisibility(View.GONE);
+                }
+                adapter.notifyDataSetChanged();
                 ActivitySendFile.getInstance().setSelection();
             }
         });
         eBook = new ArrayList<>();
         documentList = new ArrayList<>();
         zipList = new ArrayList<>();
-        gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
+        GridView gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_folder, folderList);
         gridLayout.setAdapter(adapter);
@@ -114,7 +105,7 @@ public class FilesFragment extends Fragment {
     private void setUpAdapter(String selected) {
         switch (selected) {
             case "Zip":
-                filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
+                FilesAdapter filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
                         R.layout.delegate_folder, zipList);
                 listView.setAdapter(filesAdapter);
                 break;
@@ -137,7 +128,7 @@ public class FilesFragment extends Fragment {
         private ArrayList<String> folderList;
         private ViewHolder viewHolder;
 
-        public Adapter(Context context, int resource, ArrayList<String> folderList) {
+        Adapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
             this.folderList = folderList;
         }
@@ -189,13 +180,14 @@ public class FilesFragment extends Fragment {
 
         private ArrayList<String> folderList;
 
-        public FilesAdapter(Context context, int resource, ArrayList<String> folderList) {
+        FilesAdapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
             this.folderList = folderList;
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            FilesHolder filesHolder;
             if (convertView == null) {
                 filesHolder = new FilesHolder();
                 convertView = getActivity().getLayoutInflater()
@@ -211,13 +203,14 @@ public class FilesFragment extends Fragment {
             File file = new File(folderList.get(position));
             filesHolder.fileName.setText(file.getName());
             filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(),file.length()));
-            if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+            if (ActivitySendFile.sendList.containsKey(file.getAbsolutePath())) {
                 filesHolder.mCheckBox.setVisibility(View.VISIBLE);
                 filesHolder.mCheckBox.setChecked(true);
             } else {
                 filesHolder.mCheckBox.setVisibility(View.INVISIBLE);
                 filesHolder.mCheckBox.setChecked(false);
             }
+            notifyDataSetChanged();
 
             return convertView;
 
@@ -246,7 +239,12 @@ public class FilesFragment extends Fragment {
 
         @Override
         protected String doInBackground(String... strings) {
-            searchFolderRecursive(path);
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    searchFolderRecursive(path);
+                }
+            });
             return null;
         }
 
@@ -259,26 +257,28 @@ public class FilesFragment extends Fragment {
             File listFile[] = dir.listFiles();
 
             if (listFile != null) {
-                for (int i = 0; i < listFile.length; i++) {
-                    if (listFile[i].isDirectory()) {
-                        if (!listFile[i].getParentFile().getName().equals("Android"))
-                            searchFolderRecursive(listFile[i]);
+                for (File aListFile : listFile) {
+                    if (aListFile.isDirectory()) {
+                        if (!aListFile.getParentFile().getName().equals("Android"))
+                            searchFolderRecursive(aListFile);
                     } else {
-                        if (listFile[i].getName().endsWith(pdfPattern) ||
-                                listFile[i].getName().endsWith(txtPattern) ||
-                                listFile[i].getName().endsWith(docPattern) ||
-                                listFile[i].getName().endsWith(zipPattern)) {
-                            File file = listFile[i];
-                            if (listFile[i].getName().endsWith(".zip") &&
-                                    !zipList.contains(listFile[i].toString())) {
-                                zipList.add(listFile[i].toString());
+                        if (aListFile.getName().endsWith(pdfPattern) ||
+                                aListFile.getName().endsWith(txtPattern) ||
+                                aListFile.getName().endsWith(docPattern) ||
+                                aListFile.getName().endsWith(zipPattern)) {
+                            if (aListFile.getName().endsWith(".zip") &&
+                                    !zipList.contains(aListFile.toString())) {
+                                zipList.add(aListFile.toString());
+                                adapter.notifyDataSetChanged();
                                 publishProgress();
-                            } else if (listFile[i].getName().endsWith(".pdf") ||
-                                    listFile[i].getName().endsWith(".doc") && !documentList.contains(listFile[i].toString())) {
-                                documentList.add(listFile[i].toString());
+                            } else if (aListFile.getName().endsWith(".pdf") ||
+                                    aListFile.getName().endsWith(".doc") && !documentList.contains(aListFile.toString())) {
+                                documentList.add(aListFile.toString());
+                                adapter.notifyDataSetChanged();
                                 publishProgress();
-                            } else if (listFile[i].getName().endsWith(".txt") && eBook.contains(listFile[i].toString())) {
-                                eBook.add(listFile[i].toString());
+                            } else if (aListFile.getName().endsWith(".txt") && eBook.contains(aListFile.toString())) {
+                                eBook.add(aListFile.toString());
+                                adapter.notifyDataSetChanged();
                                 publishProgress();
                             }
                         }
@@ -290,7 +290,9 @@ public class FilesFragment extends Fragment {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            adapter.notifyDataSetChanged();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
+            }
         }
 
         @Override
@@ -298,5 +300,4 @@ public class FilesFragment extends Fragment {
             super.onPostExecute(s);
         }
     }
-
 }

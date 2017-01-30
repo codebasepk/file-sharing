@@ -7,7 +7,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,18 +18,15 @@ import android.widget.ImageView;
 
 import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.ThumbnailCreationTask;
 
 import java.io.File;
 import java.util.ArrayList;
-
-/**
- * Created by shahid on 17/01/2017.
- */
+import java.util.HashMap;
 
 public class VideosFragment extends Fragment {
 
-    private GridView gridLayout;
     public ArrayList<String> videoList;
     private Adapter adapter;
     private static VideosFragment sInstance;
@@ -45,22 +41,26 @@ public class VideosFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.videos_fragment, container, false);
         sInstance = this;
         videoList = new ArrayList<>();
-        gridLayout = (GridView) rootView.findViewById(R.id.video_grid);
+        GridView gridLayout = (GridView) rootView.findViewById(R.id.video_grid);
         adapter = new Adapter(getActivity().getApplicationContext(),
                 R.layout.delegate_video_fragment, videoList);
         gridLayout.setAdapter(adapter);
         gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    File file = new File(videoList.get(i));
-                    if (!ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
-                        ActivitySendFile.selectedHashMap.put(file.getName(), file.toString());
-                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setChecked(true);
-                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setVisibility(View.VISIBLE);
+                CheckBox videosCheckbox = (CheckBox) view.findViewById(R.id.videos_checkbox);
+                File file = new File(videoList.get(i));
+                String filePath = file.getAbsolutePath();
+                HashMap<String, String> fileItem = Helpers.getFileMetadataMap(
+                        file.getAbsolutePath(), "videos");
+                    if (!ActivitySendFile.sendList.containsKey(filePath)) {
+                        ActivitySendFile.sendList.put(filePath, fileItem);
+                        videosCheckbox.setChecked(true);
+                        videosCheckbox.setVisibility(View.VISIBLE);
                     } else {
-                        ActivitySendFile.selectedHashMap.remove(file.getName());
-                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setChecked(false);
-                        ((CheckBox) view.findViewById(R.id.videos_checkbox)).setVisibility(View.GONE);
+                        ActivitySendFile.sendList.remove(filePath);
+                        videosCheckbox.setChecked(false);
+                        videosCheckbox.setVisibility(View.GONE);
                     }
                 ActivitySendFile.getInstance().setSelection();
             }
@@ -87,7 +87,7 @@ public class VideosFragment extends Fragment {
         Uri uri;
         Cursor cursor;
         int column_index_data;
-        String absolutePathOfImage = null;
+        String absolutePathOfImage;
         uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
         String[] projection = { MediaStore.MediaColumns.DATA,
@@ -100,7 +100,6 @@ public class VideosFragment extends Fragment {
 
         while (cursor.moveToNext()) {
             absolutePathOfImage = cursor.getString(column_index_data);
-            File file = new File(absolutePathOfImage);
             if (!videoList.contains(absolutePathOfImage)) {
                 videoList.add(absolutePathOfImage);
                 adapter.notifyDataSetChanged();
@@ -113,7 +112,7 @@ public class VideosFragment extends Fragment {
         private ArrayList<String> folderList;
         private ViewHolder viewHolder;
 
-        public Adapter(Context context, int resource, ArrayList<String> folderList) {
+        Adapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
             this.folderList = folderList;
         }
@@ -132,7 +131,7 @@ public class VideosFragment extends Fragment {
             }
             File file = new File(folderList.get(position));
             new ThumbnailCreationTask(getActivity().getApplicationContext(), viewHolder, position).execute();
-            if (ActivitySendFile.selectedHashMap.containsKey(file.getName())) {
+            if (ActivitySendFile.sendList.containsKey(file.getAbsolutePath())) {
                 viewHolder.checkbox.setVisibility(View.VISIBLE);
                 viewHolder.checkbox.setChecked(true);
             } else {

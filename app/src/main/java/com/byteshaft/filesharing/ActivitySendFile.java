@@ -22,11 +22,8 @@ import java.util.HashMap;
 
 public class ActivitySendFile extends AppCompatActivity {
 
-    private SectionsPagerAdapter mSectionsPagerAdapter;
-    private ViewPager mViewPager;
-    public static HashMap<String, String> selectedHashMap;
+    public static HashMap<String, HashMap<String, String>> sendList;
     private Button selectedButton;
-    private Button nextButton;
     private static ActivitySendFile sInstance;
 
     public static ActivitySendFile getInstance() {
@@ -38,21 +35,21 @@ public class ActivitySendFile extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_file);
         sInstance = this;
-        selectedHashMap = new HashMap<>();
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        mViewPager = (ViewPager) findViewById(R.id.view_pager);
+        sendList = new HashMap<>();
+        SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
+        ViewPager mViewPager = (ViewPager) findViewById(R.id.view_pager);
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mViewPager.setOffscreenPageLimit(3);
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
         selectedButton = (Button) findViewById(R.id.selected);
-        nextButton = (Button) findViewById(R.id.next);
+        Button nextButton = (Button) findViewById(R.id.next);
         selectedButton.setText("Selected");
         setSelection();
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedHashMap.size() > 0) {
+                if (sendList.size() > 0) {
                     startActivity(new Intent(getApplicationContext(), PlaceholderPeersActivity.class));
                 } else {
                     Toast.makeText(getApplicationContext(),
@@ -63,7 +60,7 @@ public class ActivitySendFile extends AppCompatActivity {
     }
 
     public void setSelection() {
-        selectedButton.setText(String.format("selected(%d)", selectedHashMap.size()));
+        selectedButton.setText(String.format("selected(%d)", sendList.size()));
     }
 
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
