@@ -9,12 +9,13 @@
     tools:context="com.byteshaft.filesharing.ActivityReceiveFile">
 
     <TextView
+        android:id="@+id/tv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/pulsator"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="20dp"
-        android:text="Searching ..."
+        android:text="Waiting for sender..."
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 

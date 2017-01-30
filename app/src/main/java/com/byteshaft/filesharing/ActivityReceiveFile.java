@@ -33,9 +33,10 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private boolean mNotInitialized;
     private CircularImageView imageView;
     private TextView mUserName;
+    private TextView mStatusText;
     private String user;
     private Hotspot mHotspot;
-    PulsatorLayout pulsator;
+    private PulsatorLayout pulsator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 getApplicationContext()).getString("username", "User");
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
+
         imageView = (CircularImageView) findViewById(R.id.image_view);
+        mStatusText = (TextView) findViewById(R.id.tv_status);
         mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText(user);
         mHotspot = new Hotspot(getApplicationContext());
