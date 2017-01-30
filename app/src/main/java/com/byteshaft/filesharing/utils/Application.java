@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 public class Application extends android.app.Application {
 
     public static final String FIRTS_TIME_KEY = "key";
+    private static final String KEY_IS_RECEIVE_SUPPORTED = "receive_supported";
 
     private static Context sContext;
 
@@ -32,5 +33,15 @@ public class Application extends android.app.Application {
 
     public static SharedPreferences getPreferenceManager() {
         return getContext().getSharedPreferences("shared_prefs", MODE_PRIVATE);
+    }
+
+    public static boolean isSupportedToReceive() {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        return sharedPreferences.getBoolean(KEY_IS_RECEIVE_SUPPORTED, true);
+    }
+
+    public static void setIsReceiveSupported(boolean isSupported) {
+        SharedPreferences sharedPreferences = getPreferenceManager();
+        sharedPreferences.edit().putBoolean(KEY_IS_RECEIVE_SUPPORTED, isSupported).apply();
     }
 }
