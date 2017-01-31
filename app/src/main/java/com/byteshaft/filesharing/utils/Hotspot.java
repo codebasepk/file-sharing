@@ -77,7 +77,6 @@ public class Hotspot {
             WifiManager wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(Context.WIFI_SERVICE);
             Method getConfigMethod = wifiManager.getClass().getMethod("getWifiApConfiguration");
             WifiConfiguration wifiConfig = (WifiConfiguration) getConfigMethod.invoke(wifiManager);
-
             wifiConfig.SSID = name;
             wifiConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
