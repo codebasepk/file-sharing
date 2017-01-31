@@ -52,8 +52,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private PulsatorLayout pulsator;
 
     private RoundCornerProgressBar mProgressBar;
-    private FrameLayout progressLayout;
-    private TextView percentAge;
     private TextView uploadDetails;
 
     private long mSize;
@@ -70,8 +68,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
 
         uploadDetails = (TextView) findViewById(R.id.file_number);
         mProgressBar = (RoundCornerProgressBar) findViewById(R.id.progressbar_Horizontal);
-        progressLayout = (FrameLayout) findViewById(R.id.progress_layout);
-        percentAge = (TextView) findViewById(R.id.percentage);
 
         user = PreferenceManager.getDefaultSharedPreferences(
                 getApplicationContext()).getString("username", "User");
@@ -92,10 +88,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 return;
             } else {
                 Log.i("TAG", "settings else boolean " + mNotInitialized);
-//                if (mNotInitialized) {
                     incomingFileRequestThread.start();
                     mNotInitialized = false;
-//                }
             }
         } else {
             incomingFileRequestThread.start();
@@ -116,21 +110,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
             case CLOSE_HOTSPOT:
                 finish();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (Settings.System.canWrite(getApplicationContext())) {
-//                if (mNotInitialized) {
-//                    incomingFileRequestThread.start();
-//                    mNotInitialized = false;
-//                }
-//            } else {
-//                startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
-//            }
-//        }
     }
 
     public static boolean isSharingWiFi() {
@@ -187,13 +166,16 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                 final AlertDialog.Builder alertDialogBuilder = new
                                         AlertDialog.Builder(ActivityReceiveFile.this);
                                 alertDialogBuilder.setTitle("");
-                                alertDialogBuilder.setMessage("Android M or above prohibits auto starting" +
-                                        " Wifi-hotspot. Please set manually.").setCancelable(false)
+                                alertDialogBuilder.setMessage(
+                                        "Android 6.0 or above prohibits auto starting" +
+                                        " Wifi-hotspot. Please enable manually.").setCancelable(false)
                                         .setPositiveButton("Set", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialogInterface, int id) {
                                                 dialogInterface.dismiss();
-                                               mHotspot.createForM(Helpers.generateSSID(
-                                                user, String.valueOf(serverSocket.getLocalPort())),
+                                                mHotspot.createForM(Helpers.generateSSID(
+                                                        user,
+                                                        String.valueOf(serverSocket.getLocalPort())
+                                                ),
                                                 ActivityReceiveFile.this, OPEN_HOTSPOT);
                                             }
                                         });
@@ -212,10 +194,12 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 } else {
                     if (!isSharingWiFi()) {
                         mHotspot.create(Helpers.generateSSID(
-                                user, String.valueOf(serverSocket.getLocalPort())), ActivityReceiveFile.this, OPEN_HOTSPOT);
+                                user,
+                                String.valueOf(serverSocket.getLocalPort())),
+                                ActivityReceiveFile.this, OPEN_HOTSPOT);
 
                     }
-                    }
+                }
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     InputStream in = clientSocket.getInputStream();
@@ -243,7 +227,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         @Override
                         public void run() {
                             uploadDetails.setText(
-                                    jsonObject.optString("currentFileNumber") + "/" + jsonObject.optString("filesCount"));
+                                    jsonObject.optString("currentFileNumber")
+                                            + "/" + jsonObject.optString("filesCount"));
 
                         }
                     });
@@ -279,9 +264,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     });
                     Log.i("TAG", "current "+ jsonObject.optInt("currentFileNumber")
                             + "Files count " + jsonObject.optInt("filesCount"));
-//                    if (jsonObject.optInt("currentFileNumber") == jsonObject.optInt("filesCount")) {
-//                        ActivityReceiveFile.this.finish();
-//                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

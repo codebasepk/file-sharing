@@ -6,7 +6,7 @@ import android.content.SharedPreferences;
 
 public class AppGlobals extends android.app.Application {
 
-    public static final String FIRTS_TIME_KEY = "key";
+    public static final String KEY_FIRST_RUN = "key";
     private static final String KEY_IS_RECEIVE_SUPPORTED = "receive_supported";
 
     private static Context sContext;
@@ -23,12 +23,12 @@ public class AppGlobals extends android.app.Application {
 
     public static void saveBoolean(boolean value) {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        sharedPreferences.edit().putBoolean(AppGlobals.FIRTS_TIME_KEY, value).apply();
+        sharedPreferences.edit().putBoolean(AppGlobals.KEY_FIRST_RUN, value).apply();
     }
 
     public static boolean isRunningFirstTime() {
         SharedPreferences sharedPreferences = getPreferenceManager();
-        return sharedPreferences.getBoolean(AppGlobals.FIRTS_TIME_KEY, true);
+        return sharedPreferences.getBoolean(AppGlobals.KEY_FIRST_RUN, true);
     }
 
     public static SharedPreferences getPreferenceManager() {
