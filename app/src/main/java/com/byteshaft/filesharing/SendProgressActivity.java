@@ -1,8 +1,11 @@
 package com.byteshaft.filesharing;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -27,11 +30,17 @@ public class SendProgressActivity extends PlaceholderPeersActivity{
 
     private ListView listView;
     private ArrayList<String> file;
+    private static SendProgressActivity sInstance;
+
+    public static SendProgressActivity getInstance() {
+        return sInstance;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.send_layout);
+        sInstance = this;
         listView = (ListView) findViewById(R.id.list_view);
         file = new ArrayList<>();
         Iterator entries = ActivitySendFile.sendList.entrySet().iterator();
@@ -42,6 +51,27 @@ public class SendProgressActivity extends PlaceholderPeersActivity{
         }
         Adapter adapter = new Adapter(getApplicationContext(), R.layout.delegate_files, file);
         listView.setAdapter(adapter);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.retry_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_retry) {
+            method();
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     class Adapter extends ArrayAdapter<String> {
@@ -67,7 +97,6 @@ public class SendProgressActivity extends PlaceholderPeersActivity{
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File file = new File(toBeSend.get(position));
-            Log.i("TAG", "file " + toBeSend.get(position));
             viewHolder.fileName.setText(file.getName());
             viewHolder.fileUri.setText(file.toString());
             return convertView;
