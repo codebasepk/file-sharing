@@ -1,4 +1,4 @@
-package com.byteshaft.filesharing;
+package com.byteshaft.filesharing.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.byteshaft.filesharing.PlaceholderPeersActivity;
+import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.fragments.FilesFragment;
 import com.byteshaft.filesharing.fragments.MusicFragment;
 import com.byteshaft.filesharing.fragments.PhotosFragment;

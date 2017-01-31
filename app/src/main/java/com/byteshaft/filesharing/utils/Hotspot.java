@@ -10,7 +10,7 @@ import android.util.Log;
 
 import java.lang.reflect.Method;
 
-import static com.byteshaft.filesharing.ActivityReceiveFile.isSharingWiFi;
+import static com.byteshaft.filesharing.activities.ActivityReceiveFile.isSharingWiFi;
 
 public class Hotspot {
 

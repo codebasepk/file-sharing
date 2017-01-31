@@ -1,4 +1,4 @@
-package com.byteshaft.filesharing;
+package com.byteshaft.filesharing.activities;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.byteshaft.filesharing.PlaceholderPeersActivity;
+import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.utils.AppGlobals;
 import com.byteshaft.filesharing.utils.Helpers;
 

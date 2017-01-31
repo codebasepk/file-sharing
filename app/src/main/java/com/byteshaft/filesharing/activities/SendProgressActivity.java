@@ -1,9 +1,7 @@
-package com.byteshaft.filesharing;
+package com.byteshaft.filesharing.activities;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,20 +11,15 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.byteshaft.filesharing.R;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 
-
-/**
- * Created by s9iper1 on 1/30/17.
- */
-
-public class SendProgressActivity extends PlaceholderPeersActivity{
+public class SendProgressActivity extends PlaceholderPeersActivity {
 
     private ListView listView;
     private ArrayList<String> file;

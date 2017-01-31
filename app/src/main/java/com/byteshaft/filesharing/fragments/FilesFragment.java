@@ -19,13 +19,15 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+;
 
 public class FilesFragment extends Fragment implements AdapterView.OnItemClickListener {
 

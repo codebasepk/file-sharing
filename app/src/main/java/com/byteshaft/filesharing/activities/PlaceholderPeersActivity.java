@@ -1,4 +1,4 @@
-package com.byteshaft.filesharing;
+package com.byteshaft.filesharing.activities;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.RadarView;
 
@@ -315,7 +316,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 wifiManager.disconnect();
                 wifiManager.enableNetwork(i.networkId, true);
                 wifiManager.reconnect();
-//                mConnectionRequested = true;
                 break;
             }
         }
@@ -352,26 +352,11 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             DataInputStream dis = new DataInputStream(bis);
             dis.readFully(fileBytesArray, 0, fileBytesArray.length);
             OutputStream os = sock.getOutputStream();
-
-
-            int bytes_read = 0;
-            int bytesReadTotal = 0;
-            int buffer_size = 1024;
-            byte[] buffer = new byte[buffer_size];
-            int progress = 0;
-
             //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(
-                    getMetadata(
+            dos.writeUTF(getMetadata(
                             myFile.getName(), fileType, myFile.length(), currentFile, filesCount));
             dos.writeLong(fileBytesArray.length);
-//            while ((bytes_read = fis.read(buffer, 0, buffer_size)) > 0) {
-//                dos.write(buffer, 0, bytes_read);
-//                bytesReadTotal += bytes_read;
-//                progress = (int) (100.0f * bytesReadTotal / myFile.length());
-//                Log.i("asd", "direct progress: " + progress);
-//            }
             dos.write(fileBytesArray, 0, fileBytesArray.length);
             dos.flush();
 
@@ -382,7 +367,11 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Toast.makeText(PlaceholderPeersActivity.this, "Please try again", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(
+                            PlaceholderPeersActivity.this,
+                            "Please try again",
+                            Toast.LENGTH_SHORT
+                    ).show();
                 }
             });
             Log.i("TAG", "exception");
@@ -410,8 +399,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            System.out.println(intent.getAction());
-            System.out.println(mConnectionRequested);
             if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
                 NetworkInfo networkInfo =
                         intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
@@ -433,10 +420,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
                             }
-                            System.out.print("sending after 10 sec");
                             String hostIP = intToInetAddress(
                                     mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                            System.out.print("size " + ActivitySendFile.sendList.values());
                             for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
                                 count++;
                                 sendFileOverNetwork(

@@ -1,4 +1,4 @@
-package com.byteshaft.filesharing;
+package com.byteshaft.filesharing.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,15 +12,14 @@ import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.utils.AppGlobals;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
-import com.github.siyamed.shapeimageview.CircularImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,16 +36,10 @@ import java.net.Socket;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-import static android.R.attr.data;
-import static android.R.attr.dial;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-
 public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
-    private CircularImageView imageView;
     private TextView mUserName;
-    private TextView mStatusText;
     private String user;
     private Hotspot mHotspot;
     private PulsatorLayout pulsator;
@@ -74,8 +67,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
 
-        imageView = (CircularImageView) findViewById(R.id.image_view);
-        mStatusText = (TextView) findViewById(R.id.tv_status);
         mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText(user);
         mHotspot = new Hotspot(getApplicationContext());
