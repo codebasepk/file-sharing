@@ -21,7 +21,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -31,22 +31,22 @@
         </activity>
 
         <activity
-            android:name=".ActivitySendFile"
+            android:name=".activities.ActivitySendFile"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".ActivityReceiveFile"
+            android:name=".activities.ActivityReceiveFile"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".PlaceholderPeersActivity"
+            android:name=".activities.PlaceholderPeersActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
-            android:name=".SendProgressActivity"
+            android:name=".activities.SendProgressActivity"
             android:screenOrientation="portrait"/>
 
     </application>

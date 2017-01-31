@@ -266,7 +266,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 if (view instanceof ImageButton) {
                     if (ActivitySendFile.sendList.size() < 1) {
                         Toast.makeText(PlaceholderPeersActivity.this, "please select files to send", Toast.LENGTH_SHORT).show();
-                        PlaceholderPeersActivity.this.finish();
+                        finish();
                         return;
                     }
                     startActivity(new Intent(getApplicationContext(), SendProgressActivity.class));
@@ -341,25 +341,29 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     }
 
     @WorkerThread
-    public void sendFileOverNetwork(String hostIP, String port, String filePath,
-                                           String fileType, int currentFile, int filesCount) {
+    public void sendFileOverNetwork(String hostIP, String port, String filePath, String fileType,
+                                    int currentFile, int filesCount) {
         try {
             Socket sock = new Socket(hostIP, Integer.valueOf(port));
             File myFile = new File(filePath);
-            byte[] fileBytesArray = new byte[(int) myFile.length()];
             FileInputStream fis = new FileInputStream(myFile);
             BufferedInputStream bis = new BufferedInputStream(fis);
             DataInputStream dis = new DataInputStream(bis);
-            dis.readFully(fileBytesArray, 0, fileBytesArray.length);
             OutputStream os = sock.getOutputStream();
-            //Sending file name and file size to the server
             DataOutputStream dos = new DataOutputStream(os);
-            dos.writeUTF(getMetadata(
+            dos.writeUTF(
+                    getMetadata(
                             myFile.getName(), fileType, myFile.length(), currentFile, filesCount));
-            dos.writeLong(fileBytesArray.length);
-            dos.write(fileBytesArray, 0, fileBytesArray.length);
-            dos.flush();
-
+            dos.writeLong(myFile.length());
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            int uploaded = 0;
+            while ((bytesRead = dis.read(buffer)) != -1) {
+                dos.write(buffer, 0, bytesRead);
+                dos.flush();
+                uploaded += bytesRead;
+                System.out.println(uploaded);
+            }
             //Closing socket
             sock.close();
         } catch (IOException e) {
