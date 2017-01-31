@@ -362,7 +362,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 dos.write(buffer, 0, bytesRead);
                 dos.flush();
                 uploaded += bytesRead;
-                System.out.println(uploaded);
+                System.out.println((int) ((float) uploaded / myFile.length() * 100));
             }
             //Closing socket
             sock.close();
