@@ -64,6 +64,12 @@ public class PhotosFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+    }
+
     class GetAllImages extends AsyncTask<String, String, String> {
         @Override
         protected String doInBackground(String... strings) {

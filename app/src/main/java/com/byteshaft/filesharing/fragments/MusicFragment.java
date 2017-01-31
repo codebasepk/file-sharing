@@ -63,6 +63,12 @@ public class MusicFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+    }
+
     private void getAudioList() {
         String[] acceptedExtensions= {"mp3", "mp2", "wav", "flac", "ogg", "au" , "snd", "mid", "midi", "kar"
                 , "mga", "aif", "aiff", "aifc", "m3u", "oga", "spx"};

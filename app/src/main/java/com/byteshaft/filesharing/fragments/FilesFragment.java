@@ -101,6 +101,11 @@ public class FilesFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+    }
 
     private void setUpAdapter(String selected) {
         switch (selected) {

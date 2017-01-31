@@ -69,6 +69,12 @@ public class VideosFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
+    }
+
     class GetVideosTask extends AsyncTask<String, String, String> {
 
         @Override

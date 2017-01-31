@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.byteshaft.filesharing.utils.AppGlobals;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
 import com.github.siyamed.shapeimageview.CircularImageView;
@@ -38,6 +39,7 @@ import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
 import static android.R.attr.data;
 import static android.R.attr.dial;
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
 
 public class ActivityReceiveFile extends AppCompatActivity {
 
@@ -58,6 +60,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private long mSent;
     private static final int OPEN_SETTING = 0;
     private static final int OPEN_HOTSPOT = 1;
+    private static final int CLOSE_HOTSPOT = 2;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +107,14 @@ public class ActivityReceiveFile extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
             case OPEN_SETTING:
-                incomingFileRequestThread.start();
+                if (isSharingWiFi()) {
+                    incomingFileRequestThread.start();
+                } else {
+                    finish();
+                }
                 break;
+            case CLOSE_HOTSPOT:
+                finish();
         }
     }
 
@@ -123,9 +133,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
 //        }
     }
 
-    public boolean isSharingWiFi() {
+    public static boolean isSharingWiFi() {
         try {
-            WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+            WifiManager manager = (WifiManager) AppGlobals.getContext().getSystemService(Context.WIFI_SERVICE);
             final Method method = manager.getClass().getDeclaredMethod("isWifiApEnabled");
             method.setAccessible(true); //in the case of visibility change in future APIs
             return (Boolean) method.invoke(manager);
@@ -136,9 +146,29 @@ public class ActivityReceiveFile extends AppCompatActivity {
     }
 
     @Override
+    protected void onPause() {
+        mHotspot.destroy(ActivityReceiveFile.this, CLOSE_HOTSPOT);
+        if (isSharingWiFi()) {
+            finish();
+        }
+        super.onPause();
+    }
+
+    @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        mHotspot.destroy();
+        mHotspot.destroy(ActivityReceiveFile.this, CLOSE_HOTSPOT);
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (isSharingWiFi()) {
+                    Intent intent = new Intent();
+                    intent.setAction(Settings.ACTION_WIRELESS_SETTINGS);
+                    startActivityForResult(intent, CLOSE_HOTSPOT);
+                } else {
+                    finish();
+                }
+            }
+        }, 500);
     }
 
     private Thread incomingFileRequestThread = new Thread(new Runnable() {
@@ -146,30 +176,25 @@ public class ActivityReceiveFile extends AppCompatActivity {
         public void run() {
             try {
                 int bytesRead;
-                ServerSocket serverSocket = new ServerSocket(0);
+                final ServerSocket serverSocket = new ServerSocket(0);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                     Log.i("TAG", "creating for M ");
-                    mHotspot.createForM(Helpers.generateSSID(
-                            user, String.valueOf(serverSocket.getLocalPort())));
                     Log.i("TAG", "wifi sharing" + isSharingWiFi());
                     if (!isSharingWiFi()) {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                AlertDialog.Builder alertDialogBuilder = new
+                                final AlertDialog.Builder alertDialogBuilder = new
                                         AlertDialog.Builder(ActivityReceiveFile.this);
                                 alertDialogBuilder.setTitle("");
                                 alertDialogBuilder.setMessage("Android M or above prohibits auto starting" +
                                         " Wifi-hotspot. Please set manually.").setCancelable(false)
                                         .setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                                            public void onClick(DialogInterface dialog, int id) {
-                                                dialog.dismiss();
-                                                Intent intent = new Intent();
-                                                intent.setAction(Settings.ACTION_WIRELESS_SETTINGS);
-//                        intent.setAction(Intent.ACTION_VIEW);
-//                        intent.setClassName("com.android.settings.wifi", "com.android.settings.wifi.WifiApDialog");
-                                                startActivityForResult(intent, OPEN_HOTSPOT);
-
+                                            public void onClick(DialogInterface dialogInterface, int id) {
+                                                dialogInterface.dismiss();
+                                               mHotspot.createForM(Helpers.generateSSID(
+                                                user, String.valueOf(serverSocket.getLocalPort())),
+                                                ActivityReceiveFile.this, OPEN_HOTSPOT);
                                             }
                                         });
                                 alertDialogBuilder.setNegativeButton("Quit", new DialogInterface.OnClickListener() {
@@ -179,15 +204,18 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                         ActivityReceiveFile.this.finish();
                                     }
                                 });
-                                AlertDialog alertDialog = alertDialogBuilder.create();
-                                alertDialog.show();
+                                    alertDialog = alertDialogBuilder.create();
+                                    alertDialog.show();
                             }
                         });
                     }
                 } else {
-                    mHotspot.create(Helpers.generateSSID(
-                            user, String.valueOf(serverSocket.getLocalPort())));
-                }
+                    if (!isSharingWiFi()) {
+                        mHotspot.create(Helpers.generateSSID(
+                                user, String.valueOf(serverSocket.getLocalPort())), ActivityReceiveFile.this, OPEN_HOTSPOT);
+
+                    }
+                    }
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     InputStream in = clientSocket.getInputStream();
@@ -216,6 +244,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         public void run() {
                             uploadDetails.setText(
                                     jsonObject.optString("currentFileNumber") + "/" + jsonObject.optString("filesCount"));
+
                         }
                     });
                     runOnUiThread(new Runnable() {
@@ -236,7 +265,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                             }
                         });
                     }
-//                    output.flush();
+                    output.flush();
                     output.close();
                     runOnUiThread(new Runnable() {
                         @Override
@@ -248,6 +277,11 @@ public class ActivityReceiveFile extends AppCompatActivity {
                             ).show();
                         }
                     });
+                    Log.i("TAG", "current "+ jsonObject.optInt("currentFileNumber")
+                            + "Files count " + jsonObject.optInt("filesCount"));
+//                    if (jsonObject.optInt("currentFileNumber") == jsonObject.optInt("filesCount")) {
+//                        ActivityReceiveFile.this.finish();
+//                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
