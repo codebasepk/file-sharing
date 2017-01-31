@@ -4,11 +4,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.location.LocationManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Base64;
 
-import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,28 +28,8 @@ public class Helpers {
     public static boolean locationEnabled() {
         LocationManager lm = (LocationManager) AppGlobals.getContext()
                 .getSystemService(Context.LOCATION_SERVICE);
-        boolean gps_enabled = false;
-        boolean network_enabled = false;
-
-        try {
-            gps_enabled = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        } catch (Exception ex) {
-        }
-
-        try {
-            network_enabled = lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-        } catch (Exception ex) {
-        }
-
-        return gps_enabled || network_enabled;
-    }
-
-    public static void ensureDataDirectoryCreated(Context context) {
-        String appName = "FileSharing";
-        File directory = new File(Environment.getExternalStorageDirectory() + "/" + appName);
-        if (!directory.exists()) {
-            directory.mkdirs();
-        }
+        return lm.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || lm.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
     }
 
     public static InetAddress intToInetAddress(int hostAddress) {

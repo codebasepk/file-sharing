@@ -7,21 +7,16 @@ import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.widget.Toast;
-
-import com.byteshaft.filesharing.ActivityReceiveFile;
 
 import java.lang.reflect.Method;
 
-import static com.byteshaft.filesharing.ActivityReceiveFile.isSharingWiFi;
+import static com.byteshaft.filesharing.activities.ActivityReceiveFile.isSharingWiFi;
 
 public class Hotspot {
 
-    private boolean mCreated;
     private Context mContext;
     private boolean mWasWifiDisabled;
     private WifiManager mWifiManager;
-    private String mName;
 
     public Hotspot(Context context) {
         mContext = context;
@@ -35,16 +30,6 @@ public class Hotspot {
         }
     }
 
-    public boolean isCreated() {
-        try {
-            Method getWifiApConfigurationMethod = mWifiManager.getClass().getMethod("getWifiApConfiguration");
-            WifiConfiguration netConfig = (WifiConfiguration) getWifiApConfigurationMethod.invoke(mWifiManager);
-            return netConfig.SSID.equals(mName);
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
     private boolean isAPCreated() {
         try {
             Method isWifiApEnabledMethod = mWifiManager.getClass().getMethod("isWifiApEnabled");
@@ -54,8 +39,7 @@ public class Hotspot {
         }
     }
 
-    public void create(String name, Activity activity , int CODE) {
-        mName = name;
+    public void create(String name, Activity activity, int CODE) {
         turnOffWifiIfOn();
         WifiConfiguration netConfig = new WifiConfiguration();
         netConfig.SSID = name;
@@ -66,14 +50,10 @@ public class Hotspot {
         try {
             Method setWifiApMethod = mWifiManager.getClass().getMethod(
                     "setWifiApEnabled", WifiConfiguration.class, boolean.class);
-            mCreated = (boolean) (Boolean) setWifiApMethod.invoke(mWifiManager, netConfig, true);
-            while (!isAPCreated()) {
-            }
-//            Method getWifiApStateMethod = mWifiManager.getClass().getMethod("getWifiApState");
-//            int apstate = (Integer) getWifiApStateMethod.invoke(mWifiManager);
+            setWifiApMethod.invoke(mWifiManager, netConfig, true);
+            while (!isAPCreated()) {}
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause().getMessage().contains("android.permission.CONNECTIVITY_INTERNAL")) {
-                AppGlobals.setIsReceiveSupported(false);
                 createForM(name, activity, CODE);
             }
         } catch (Exception e) {
@@ -83,7 +63,8 @@ public class Hotspot {
 
     public void createForM(String name, Activity activity , int CODE) {
         try {
-            WifiManager wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(
+                    Context.WIFI_SERVICE);
             Method getConfigMethod = wifiManager.getClass().getMethod("getWifiApConfiguration");
             WifiConfiguration wifiConfig = (WifiConfiguration) getConfigMethod.invoke(wifiManager);
             wifiConfig.SSID = name;
@@ -91,7 +72,8 @@ public class Hotspot {
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
             wifiConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
             wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-            Method setConfigMethod = wifiManager.getClass().getMethod("setWifiApConfiguration", WifiConfiguration.class);
+            Method setConfigMethod = wifiManager.getClass().getMethod(
+                    "setWifiApConfiguration", WifiConfiguration.class);
             setConfigMethod.invoke(wifiManager, wifiConfig);
         }
         catch (Exception e) {
@@ -104,34 +86,31 @@ public class Hotspot {
 
     public void destroy(final Activity activity, final int CLOSE_HOTSPOT) {
         try {
-            try {
-                Method setWifiApMethod = mWifiManager.getClass().getMethod(
-                        "setWifiApEnabled", WifiConfiguration.class, boolean.class);
-                mCreated = (boolean) setWifiApMethod.invoke(mWifiManager, null, false);
-            } catch (java.lang.reflect.InvocationTargetException e) {
-                if (e.getCause().getMessage().contains("android.permission.CONNECTIVITY_INTERNAL")) {
-                    new android.os.Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (isSharingWiFi()) {
-                                Intent intent = new Intent();
-                                intent.setAction(Settings.ACTION_WIRELESS_SETTINGS);
-                                activity.startActivityForResult(intent, CLOSE_HOTSPOT);
-                            } else {
-                                activity.onBackPressed();
-                            }
+            Method setWifiApMethod = mWifiManager.getClass().getMethod(
+                    "setWifiApEnabled", WifiConfiguration.class, boolean.class);
+            setWifiApMethod.invoke(mWifiManager, null, false);
+        } catch (java.lang.reflect.InvocationTargetException e) {
+            if (e.getCause().getMessage().contains(
+                    "android.permission.CONNECTIVITY_INTERNAL")) {
+                new android.os.Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (isSharingWiFi()) {
+                            Intent intent = new Intent();
+                            intent.setAction(Settings.ACTION_WIRELESS_SETTINGS);
+                            activity.startActivityForResult(intent, CLOSE_HOTSPOT);
+                        } else {
+                            activity.onBackPressed();
                         }
-                    }, 500);
-                }
-            } catch (Exception e) {
-                Log.e("HOTSPOT", "", e);
+                    }
+                }, 500);
             }
-            if (mWasWifiDisabled) {
-                mWifiManager.setWifiEnabled(true);
-                mWasWifiDisabled = false;
-            }
-        } finally {
-
+        } catch (Exception e) {
+            Log.e("HOTSPOT", "", e);
+        }
+        if (mWasWifiDisabled) {
+            mWifiManager.setWifiEnabled(true);
+            mWasWifiDisabled = false;
         }
     }
 }

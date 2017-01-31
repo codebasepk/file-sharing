@@ -1,4 +1,4 @@
-package com.byteshaft.filesharing;
+package com.byteshaft.filesharing.activities;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,15 +12,14 @@ import android.provider.Settings;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
+import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.utils.AppGlobals;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.Hotspot;
-import com.github.siyamed.shapeimageview.CircularImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,23 +36,15 @@ import java.net.Socket;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-import static android.R.attr.data;
-import static android.R.attr.dial;
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.L;
-
 public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
-    private CircularImageView imageView;
     private TextView mUserName;
-    private TextView mStatusText;
     private String user;
     private Hotspot mHotspot;
     private PulsatorLayout pulsator;
 
     private RoundCornerProgressBar mProgressBar;
-    private FrameLayout progressLayout;
-    private TextView percentAge;
     private TextView uploadDetails;
 
     private long mSize;
@@ -70,16 +61,12 @@ public class ActivityReceiveFile extends AppCompatActivity {
 
         uploadDetails = (TextView) findViewById(R.id.file_number);
         mProgressBar = (RoundCornerProgressBar) findViewById(R.id.progressbar_Horizontal);
-        progressLayout = (FrameLayout) findViewById(R.id.progress_layout);
-        percentAge = (TextView) findViewById(R.id.percentage);
 
         user = PreferenceManager.getDefaultSharedPreferences(
                 getApplicationContext()).getString("username", "User");
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
 
-        imageView = (CircularImageView) findViewById(R.id.image_view);
-        mStatusText = (TextView) findViewById(R.id.tv_status);
         mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText(user);
         mHotspot = new Hotspot(getApplicationContext());
@@ -92,10 +79,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 return;
             } else {
                 Log.i("TAG", "settings else boolean " + mNotInitialized);
-//                if (mNotInitialized) {
                     incomingFileRequestThread.start();
                     mNotInitialized = false;
-//                }
             }
         } else {
             incomingFileRequestThread.start();
@@ -116,21 +101,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
             case CLOSE_HOTSPOT:
                 finish();
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//            if (Settings.System.canWrite(getApplicationContext())) {
-//                if (mNotInitialized) {
-//                    incomingFileRequestThread.start();
-//                    mNotInitialized = false;
-//                }
-//            } else {
-//                startActivity(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS));
-//            }
-//        }
     }
 
     public static boolean isSharingWiFi() {
@@ -187,13 +157,16 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                 final AlertDialog.Builder alertDialogBuilder = new
                                         AlertDialog.Builder(ActivityReceiveFile.this);
                                 alertDialogBuilder.setTitle("");
-                                alertDialogBuilder.setMessage("Android M or above prohibits auto starting" +
-                                        " Wifi-hotspot. Please set manually.").setCancelable(false)
+                                alertDialogBuilder.setMessage(
+                                        "Android 6.0 or above prohibits auto starting" +
+                                        " Wifi-hotspot. Please enable manually.").setCancelable(false)
                                         .setPositiveButton("Set", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialogInterface, int id) {
                                                 dialogInterface.dismiss();
-                                               mHotspot.createForM(Helpers.generateSSID(
-                                                user, String.valueOf(serverSocket.getLocalPort())),
+                                                mHotspot.createForM(Helpers.generateSSID(
+                                                        user,
+                                                        String.valueOf(serverSocket.getLocalPort())
+                                                ),
                                                 ActivityReceiveFile.this, OPEN_HOTSPOT);
                                             }
                                         });
@@ -212,10 +185,12 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 } else {
                     if (!isSharingWiFi()) {
                         mHotspot.create(Helpers.generateSSID(
-                                user, String.valueOf(serverSocket.getLocalPort())), ActivityReceiveFile.this, OPEN_HOTSPOT);
+                                user,
+                                String.valueOf(serverSocket.getLocalPort())),
+                                ActivityReceiveFile.this, OPEN_HOTSPOT);
 
                     }
-                    }
+                }
                 while (true) {
                     Socket clientSocket = serverSocket.accept();
                     InputStream in = clientSocket.getInputStream();
@@ -243,7 +218,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         @Override
                         public void run() {
                             uploadDetails.setText(
-                                    jsonObject.optString("currentFileNumber") + "/" + jsonObject.optString("filesCount"));
+                                    jsonObject.optString("currentFileNumber")
+                                            + "/" + jsonObject.optString("filesCount"));
 
                         }
                     });
@@ -279,9 +255,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     });
                     Log.i("TAG", "current "+ jsonObject.optInt("currentFileNumber")
                             + "Files count " + jsonObject.optInt("filesCount"));
-//                    if (jsonObject.optInt("currentFileNumber") == jsonObject.optInt("filesCount")) {
-//                        ActivityReceiveFile.this.finish();
-//                    }
                 }
             } catch (IOException e) {
                 e.printStackTrace();

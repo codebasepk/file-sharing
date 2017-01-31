@@ -15,8 +15,8 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
 
 import java.io.File;
@@ -70,8 +70,10 @@ public class MusicFragment extends Fragment {
     }
 
     private void getAudioList() {
-        String[] acceptedExtensions= {"mp3", "mp2", "wav", "flac", "ogg", "au" , "snd", "mid", "midi", "kar"
-                , "mga", "aif", "aiff", "aifc", "m3u", "oga", "spx"};
+        String[] acceptedExtensions = {
+                "mp3", "mp2", "wav", "flac", "ogg", "au" , "snd", "mid", "midi", "kar",
+                "mga", "aif", "aiff", "aifc", "m3u", "oga", "spx"
+        };
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
         //your projection statement
         Cursor cursor;

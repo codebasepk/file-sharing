@@ -16,8 +16,8 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.ThumbnailCreationTask;
 
