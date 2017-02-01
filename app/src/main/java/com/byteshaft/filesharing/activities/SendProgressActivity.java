@@ -45,7 +45,6 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
             Object key = thisEntry.getKey();
             file.add(key.toString());
             progressHashMap.put(key.toString(), 0);
-            Log.i("ADDED" , "Hashmap" + progressHashMap);
         }
         adapter = new Adapter(getApplicationContext(), R.layout.delegate_files, file);
         listView.setAdapter(adapter);

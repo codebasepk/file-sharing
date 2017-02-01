@@ -356,8 +356,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 uploaded += bytesRead;
                 int progress = (int)
                         ((float) uploaded / myFile.length() * 100);
-                Log.i("TAG" , " "+ "File path "+ filePath);
-                Log.i("TAG" , " "+ "Hashmap "+ progressHashMap);
                 if (progressHashMap.containsKey(filePath)) {
                     Log.i("TAG" , " "+ String.valueOf(progress > progressHashMap.get(filePath)));
                     if (progress > progressHashMap.get(filePath)) {
