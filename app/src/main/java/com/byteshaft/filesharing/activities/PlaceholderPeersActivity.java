@@ -357,10 +357,8 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 int progress = (int)
                         ((float) uploaded / myFile.length() * 100);
                 if (progressHashMap.containsKey(filePath)) {
-                    Log.i("TAG" , " "+ String.valueOf(progress > progressHashMap.get(filePath)));
                     if (progress > progressHashMap.get(filePath)) {
                         progressHashMap.put(filePath, progress);
-                        Log.i("TAG" , " "+ String.valueOf(SendProgressActivity.getInstance() == null));
                         if (SendProgressActivity.getInstance() != null) {
                             runOnUiThread(new Runnable() {
                                 @Override
@@ -450,7 +448,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         }
                         String hostIP = intToInetAddress(
                                 mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                        Log.i("LIST", "size " +ActivitySendFile.sendList.size());
                         for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
                             count++;
                             System.out.println("FILE");
