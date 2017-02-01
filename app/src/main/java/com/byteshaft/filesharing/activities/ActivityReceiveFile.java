@@ -253,6 +253,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
                             ).show();
                         }
                     });
+                    if (jsonObject.optInt("currentFileNumber") == (jsonObject.optInt("filesCount")-1)) {
+                        ActivityReceiveFile.this.finish();
+                    }
                     Log.i("TAG", "current "+ jsonObject.optInt("currentFileNumber")
                             + "Files count " + jsonObject.optInt("filesCount"));
                 }
