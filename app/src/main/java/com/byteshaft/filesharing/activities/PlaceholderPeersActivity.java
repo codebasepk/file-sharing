@@ -15,6 +15,7 @@ import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.WorkerThread;
 import android.support.v4.app.ActivityCompat;
@@ -62,11 +63,17 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     private ImageButton mRefreshButton;
     private static final int LOCATION_OFF = 0;
     private boolean exception = false;
+    private boolean completed = false;
+    public static HashMap<String, Integer> progressHashMap;
+    private boolean foreground = false;
+    private boolean connected = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_peers_list);
+        progressHashMap = new HashMap<>();
+        foreground = true;
         mRefreshButton = (ImageButton) findViewById(R.id.button_refresh_peers);
         radarLayout = (FrameLayout) findViewById(R.id.radar_layout);
         mRefreshButton.setOnClickListener(this);
@@ -188,15 +195,17 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(
-                wifiStateReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
+        foreground = true;
+//        registerReceiver(
+//                wifiStateReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        foreground = false;
         try {
-            unregisterReceiver(wifiStateReceiver);
+//            unregisterReceiver(wifiStateReceiver);
             unregisterReceiver(mWifiScanReceiver);
         } catch (IllegalArgumentException ignore) {
 
@@ -290,6 +299,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     int count = 0;
                     for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
                         count++;
+                        System.out.println("LOOOOOOOOOOOOOOOPER");
                         sendFileOverNetwork(
                                 hostIP,
                                 Helpers.decodeString(mPeer.SSID.split("-")[2]),
@@ -302,24 +312,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 }
             }).start();
         }
-    }
-
-    private void connectToSSID(String SSID) {
-        WifiConfiguration conf = new WifiConfiguration();
-        conf.SSID = "\"" + SSID + "\"";
-        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
-        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
-        wifiManager.addNetwork(conf);
-        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
-        for (WifiConfiguration i : list) {
-            if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
-                wifiManager.disconnect();
-                wifiManager.enableNetwork(i.networkId, true);
-                wifiManager.reconnect();
-                break;
-            }
-        }
-        Log.i("TAG", "Connect "  + mWifiManager.getConnectionInfo().getSSID().contains(mPeer.SSID));
     }
 
     @Override
@@ -362,7 +354,26 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 dos.write(buffer, 0, bytesRead);
                 dos.flush();
                 uploaded += bytesRead;
-                System.out.println((int) ((float) uploaded / myFile.length() * 100));
+                int progress = (int)
+                        ((float) uploaded / myFile.length() * 100);
+                Log.i("TAG" , " "+ "File path "+ filePath);
+                Log.i("TAG" , " "+ "Hashmap "+ progressHashMap);
+                if (progressHashMap.containsKey(filePath)) {
+                    Log.i("TAG" , " "+ String.valueOf(progress > progressHashMap.get(filePath)));
+                    if (progress > progressHashMap.get(filePath)) {
+                        progressHashMap.put(filePath, progress);
+                        Log.i("TAG" , " "+ String.valueOf(SendProgressActivity.getInstance() == null));
+                        if (SendProgressActivity.getInstance() != null) {
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    SendProgressActivity.getInstance().adapter.notifyDataSetChanged();
+                                }
+                            });
+                        }
+                    }
+                }
+//                System.out.println(progress);
             }
             //Closing socket
             sock.close();
@@ -371,6 +382,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    if (!completed && foreground)
                     Toast.makeText(
                             PlaceholderPeersActivity.this,
                             "Please try again",
@@ -397,9 +409,99 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         return obj.toString();
     }
 
-    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
+    private void connectToSSID(String SSID) {
+        WifiConfiguration conf = new WifiConfiguration();
+        conf.SSID = "\"" + SSID + "\"";
+        conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        wifiManager.addNetwork(conf);
+        List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+        for (WifiConfiguration i : list) {
+            if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
+                wifiManager.disconnect();
+                wifiManager.enableNetwork(i.networkId, true);
+                wifiManager.reconnect();
+                mConnectionRequested = true;
+                break;
+            }
+        }
+        runnable.run();
+        Log.i("TAG", "Done connect to ssid");
 
+    }
+
+    public static NetworkInfo getNetworkInfo(Context context){
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo();
+    }
+
+    private Handler handler = new Handler();
+    private Runnable runnable = new Runnable() {
         int count = 0;
+        public void run() {
+            Log.i("TAG", "Running Handler");
+            if (connected) {
+                handler.removeCallbacks(runnable);
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Thread.sleep(10000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        String hostIP = intToInetAddress(
+                                mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
+                        Log.i("LIST", "size " +ActivitySendFile.sendList.size());
+                        for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
+                            count++;
+                            System.out.println("FILE");
+                            sendFileOverNetwork(
+                                    hostIP,
+                                    Helpers.decodeString(mPeer.SSID.split("-")[2]),
+                                    new File(fileItem.get("path")).getAbsolutePath(),
+                                    fileItem.get("type"),
+                                    count,
+                                    ActivitySendFile.sendList.size()
+                            );
+                        }
+                        Log.i("TAG", "Finish sending");
+                        if (!exception) {
+                            ActivitySendFile.sendList.clear();
+                            SendProgressActivity.getInstance().finish();
+                            PlaceholderPeersActivity.this.finish();
+                            completed = true;
+                            WifiConfiguration conf = new WifiConfiguration();
+                            String SSID =  mPeer.SSID;
+                            conf.SSID = "\"" + SSID + "\"";
+                            conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+                            final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+                            wifiManager.addNetwork(conf);
+                            List<WifiConfiguration> list = wifiManager.getConfiguredNetworks();
+                            for (WifiConfiguration i : list) {
+                                if (i.SSID != null && i.SSID.equals("\"" + SSID + "\"")) {
+                                    wifiManager.disconnect();
+                                }
+                            }
+                        }
+                    }
+                }).start();
+            } else {
+                NetworkInfo networkInfo = getNetworkInfo(getApplicationContext());
+                WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+                WifiInfo info = wifiManager.getConnectionInfo();
+                if (networkInfo.isConnected() && mPeer != null
+                        && info.getSSID().replaceAll("\"", "").trim().equals(mPeer.SSID.trim())) {
+                    connected = true;
+                }
+            }
+            if (!connected) {
+                handler.postDelayed(this, 1000);
+            }
+        }
+    };
+
+    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -408,43 +510,11 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                 WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
                 WifiInfo info = wifiManager.getConnectionInfo();
-                if (mPeer != null) {
-                    Log.i("TAG", "info " + String.valueOf(info.getSSID().replaceAll("\"", "").trim().equals(mPeer.SSID.trim())));
-                    Log.i("TAG", "mpeer " + String.valueOf((mPeer.SSID).trim()));
-                    Log.i("TAG", "current " + String.valueOf(info.getSSID().replaceAll("\"", "").trim()));
-                }
+                System.out.println("ACTION ");
                 if (ConnectivityManager.TYPE_WIFI == networkInfo.getType() &&
-                        networkInfo.isConnectedOrConnecting() && mPeer != null && info.getSSID().replaceAll("\"", "").trim().equals(mPeer.SSID.trim())) {
+                        networkInfo.isConnected() && mPeer != null && mConnectionRequested
+                        && info.getSSID().replaceAll("\"", "").trim().equals(mPeer.SSID.trim())) {
                     mConnectionRequested = false;
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Thread.sleep(10000);
-                            } catch (InterruptedException e) {
-                                e.printStackTrace();
-                            }
-                            String hostIP = intToInetAddress(
-                                    mWifiManager.getDhcpInfo().serverAddress).toString().replace("/", "");
-                            for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
-                                count++;
-                                sendFileOverNetwork(
-                                        hostIP,
-                                        Helpers.decodeString(mPeer.SSID.split("-")[2]),
-                                        new File(fileItem.get("path")).getAbsolutePath(),
-                                        fileItem.get("type"),
-                                        count,
-                                        ActivitySendFile.sendList.size()
-                                );
-                            }
-                            Log.i("TAG", "Finish sending");
-                            if (!exception) {
-                            ActivitySendFile.sendList.clear();
-                            SendProgressActivity.getInstance().finish();
-                            PlaceholderPeersActivity.this.finish();
-                            }
-                        }
-                    }).start();
                 }
             }
         }

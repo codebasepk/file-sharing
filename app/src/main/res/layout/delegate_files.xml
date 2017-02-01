@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
+    android:background="@drawable/customshape"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
@@ -28,12 +28,12 @@
         android:id="@+id/progressbar_horizontal"
         android:layout_below="@+id/file_uri"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:layout_height="40dp"
         android:layout_margin="10dp"
         app:rcBackgroundColor="#303F9F"
         app:rcBackgroundPadding="5dp"
         app:rcProgressColor="#4CAF50"
-        app:rcRadius="4dp"
+        app:rcRadius="10dp"
         app:rcReverse="false" />
 
 

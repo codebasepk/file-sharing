@@ -2,6 +2,7 @@ package com.byteshaft.filesharing.activities;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -15,6 +16,7 @@ import com.byteshaft.filesharing.R;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,6 +26,7 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
     private ListView listView;
     private ArrayList<String> file;
     private static SendProgressActivity sInstance;
+    public Adapter adapter;
 
     public static SendProgressActivity getInstance() {
         return sInstance;
@@ -41,8 +44,10 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
             Map.Entry thisEntry = (Map.Entry) entries.next();
             Object key = thisEntry.getKey();
             file.add(key.toString());
+            progressHashMap.put(key.toString(), 0);
+            Log.i("ADDED" , "Hashmap" + progressHashMap);
         }
-        Adapter adapter = new Adapter(getApplicationContext(), R.layout.delegate_files, file);
+        adapter = new Adapter(getApplicationContext(), R.layout.delegate_files, file);
         listView.setAdapter(adapter);
     }
 
@@ -84,7 +89,7 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.fileName = (TextView) convertView.findViewById(R.id.file_name);
                 viewHolder.fileUri = (TextView) convertView.findViewById(R.id.file_uri);
-                viewHolder.pulsatorLayout = (RoundCornerProgressBar) convertView.findViewById(R.id.progressbar_horizontal);
+                viewHolder.roundCornerProgressBar = (RoundCornerProgressBar) convertView.findViewById(R.id.progressbar_horizontal);
                 convertView.setTag(viewHolder);
             }else {
                 viewHolder = (ViewHolder) convertView.getTag();
@@ -92,6 +97,8 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
             File file = new File(toBeSend.get(position));
             viewHolder.fileName.setText(file.getName());
             viewHolder.fileUri.setText(file.toString());
+            viewHolder.roundCornerProgressBar.setMax(100);
+            viewHolder.roundCornerProgressBar.setProgress(progressHashMap.get(file.toString()));
             return convertView;
         }
 
@@ -104,7 +111,7 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
     class ViewHolder {
         TextView fileName;
         TextView fileUri;
-        RoundCornerProgressBar pulsatorLayout;
+        RoundCornerProgressBar roundCornerProgressBar;
 
     }
 }
