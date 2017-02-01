@@ -9,6 +9,8 @@ import android.util.Log;
 
 import com.byteshaft.filesharing.fragments.VideosFragment;
 
+import static android.R.attr.bitmap;
+
 public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
 
     private Context mContext;
@@ -23,10 +25,12 @@ public class ThumbnailCreationTask extends AsyncTask<Void, Void, Bitmap> {
 
     @Override
     protected Bitmap doInBackground(Void... params) {
-
-        Bitmap bitmap =  ThumbnailUtils.createVideoThumbnail
-                (VideosFragment.getInstance().videoList.get(mHolder.position),
-                        MediaStore.Video.Thumbnails.MINI_KIND);
+        Bitmap bitmap = null;
+        if (VideosFragment.getInstance().videoList.size() > 0) {
+            bitmap = ThumbnailUtils.createVideoThumbnail
+                    (VideosFragment.getInstance().videoList.get(mHolder.position),
+                            MediaStore.Video.Thumbnails.MINI_KIND);
+        }
         if (bitmap != null)
         return Bitmap.createScaledBitmap(bitmap, 200, 200, true);
         else

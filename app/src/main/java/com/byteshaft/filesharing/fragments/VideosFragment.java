@@ -16,8 +16,8 @@ import android.widget.CheckBox;
 import android.widget.GridView;
 import android.widget.ImageView;
 
-import com.byteshaft.filesharing.ActivitySendFile;
 import com.byteshaft.filesharing.R;
+import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.ThumbnailCreationTask;
 
@@ -67,6 +67,12 @@ public class VideosFragment extends Fragment {
         });
         new GetVideosTask().execute();
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
     }
 
     class GetVideosTask extends AsyncTask<String, String, String> {
