@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/background_color"
-    tools:context="com.byteshaft.filesharing.ActivityReceiveFile">
+    tools:context="com.byteshaft.filesharing.activities.ActivityReceiveFile">
 
     <TextView
         android:id="@+id/tv_status"
@@ -82,10 +82,10 @@
                 android:layout_margin="10dp"
                 app:rcBackgroundColor="#BDBDBD"
                 app:rcBackgroundPadding="5dp"
-                app:rcSecondaryProgressColor="#00796B"
                 app:rcProgressColor="#009688"
                 app:rcRadius="41dp"
-                app:rcReverse="false" />
+                app:rcReverse="false"
+                app:rcSecondaryProgressColor="#00796B" />
 
             <TextView
                 android:id="@+id/percentage"

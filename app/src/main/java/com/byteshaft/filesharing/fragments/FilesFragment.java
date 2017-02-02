@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.format.Formatter;
 import android.view.LayoutInflater;
@@ -27,87 +26,48 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-;
+public class FilesFragment extends Fragment {
 
-public class FilesFragment extends Fragment implements AdapterView.OnItemClickListener {
+    private ArrayList<String> folderList;
+    private Adapter adapter;
 
-    private static final String EXT_PDF = ".pdf";
-    private static final String EXT_TXT = ".txt";
-    private static final String EXT_DOC = ".doc";
-    private static final String EXT_ZIP = ".zip";
-    private static final String TITLE_DOCUMENT = "Document";
-    private static final String TITLE_ZIP = "Zip";
-    private static final String TITLE_EBOOK = "E-Book";
-    private static final String PLURAL_MAKER = "s";
-    private ArrayList<String> mFoldersList;
-    private Adapter mAdapter;
-    private ListView mListView;
-    private File mPath;
-    private int mSelectedFolder = -1;
-    public ArrayList<String> mZipList;
-    public ArrayList<String> mDocumentsList;
-    public ArrayList<String> mEBookList;
+    private ListView listView;
+    public ArrayList<String> zipList;
+    public ArrayList<String> documentList;
+    public ArrayList<String> eBook;
+    private File path;
+    private int selectedFolder = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.files_fragment, container, false);
-        mFoldersList = new ArrayList<>();
-        mFoldersList.add(TITLE_DOCUMENT);
-        mFoldersList.add(TITLE_ZIP);
-        mFoldersList.add(TITLE_EBOOK);
-        mPath = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-        mListView = (ListView) rootView.findViewById(R.id.list_view);
-        mListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-        mListView.setOnItemClickListener(this);
-        mEBookList = new ArrayList<>();
-        mDocumentsList = new ArrayList<>();
-        mZipList = new ArrayList<>();
-        mAdapter = new Adapter(getActivity().getApplicationContext(),
-                R.layout.delegate_folder, mFoldersList);
-        GridView gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
-        gridLayout.setAdapter(mAdapter);
-        gridLayout.setOnItemClickListener(this);
-        new GetFiles().execute();
-        return rootView;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        mAdapter.notifyDataSetChanged();
-    }
-
-    private void setUpAdapter(String selected) {
-        switch (selected) {
-            case TITLE_ZIP:
-                FilesAdapter filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
-                        R.layout.delegate_folder, mZipList);
-                mListView.setAdapter(filesAdapter);
-                break;
-            case TITLE_DOCUMENT:
-                filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
-                        R.layout.delegate_folder, mDocumentsList);
-                mListView.setAdapter(filesAdapter);
-                break;
-            case TITLE_EBOOK:
-                filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
-                        R.layout.delegate_folder, mEBookList);
-                mListView.setAdapter(filesAdapter);
-                break;
-        }
-        mAdapter.notifyDataSetChanged();
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> mAdapterView, View view, int i, long l) {
-        switch (view.getId()) {
-            case R.id.list_view:
+        folderList = new ArrayList<>();
+        folderList.add("Document");
+        folderList.add("Zip");
+        folderList.add("E-Book");
+        path = new File(Environment.getExternalStorageDirectory() + "");
+        listView = (ListView) rootView.findViewById(R.id.list_view);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 CheckBox selectionCheckbox = (CheckBox) view.findViewById(R.id.selectionCheckbox);
-                String relevantList = getFilesListByIndex(mSelectedFolder).get(i);
-                File file = new File(relevantList);
-                HashMap<String, String> fileItem = Helpers.getFileMetadataMap(
-                        file.getAbsolutePath(), getDirectoryNameByIndex(i));
+                File file = null;
+                HashMap<String, String> fileItem = null;
+                if (selectedFolder == 0) {
+                    file = new File(documentList.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "documents");
+                } else if (selectedFolder == 1) {
+                    file = new File(zipList.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "zips");
+                } else if (selectedFolder == 2) {
+                    file = new File(eBook.get(i));
+                    fileItem = Helpers.getFileMetadataMap(file.getAbsolutePath(), "ebooks");
+                }
+                if (file == null) {
+                    return;
+                }
                 String filePath = file.getAbsolutePath();
                 if (!ActivitySendFile.sendList.containsKey(filePath)) {
                     ActivitySendFile.sendList.put(filePath, fileItem);
@@ -118,55 +78,68 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
                     selectionCheckbox.setChecked(false);
                     selectionCheckbox.setVisibility(View.GONE);
                 }
-                mAdapter.notifyDataSetChanged();
+                adapter.notifyDataSetChanged();
                 ActivitySendFile.getInstance().setSelection();
-                break;
-            case R.id.photo_grid:
-                mSelectedFolder = i;
-                setUpAdapter(mFoldersList.get(i));
-                break;
-        }
+            }
+        });
+        eBook = new ArrayList<>();
+        documentList = new ArrayList<>();
+        zipList = new ArrayList<>();
+        GridView gridLayout = (GridView) rootView.findViewById(R.id.photo_grid);
+        adapter = new Adapter(getActivity().getApplicationContext(),
+                R.layout.delegate_folder, folderList);
+        gridLayout.setAdapter(adapter);
+        gridLayout.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                selectedFolder = i;
+                setUpAdapter(folderList.get(i));
+
+            }
+        });
+        new GetFiles().execute();
+        return rootView;
     }
 
-    private ArrayList<String> getFilesListByIndex(int index) {
-        switch (index) {
-            case 0:
-                return mDocumentsList;
-            case 1:
-                return mZipList;
-            case 2:
-                return mEBookList;
-            default:
-                return new ArrayList<>();
-        }
+    @Override
+    public void onResume() {
+        super.onResume();
+        adapter.notifyDataSetChanged();
     }
 
-    private String getDirectoryNameByIndex(int index) {
-        switch (index) {
-            case 0:
-                return TITLE_DOCUMENT + PLURAL_MAKER;
-            case 1:
-                return TITLE_ZIP + PLURAL_MAKER;
-            case 2:
-                return TITLE_EBOOK + PLURAL_MAKER;
-            default:
-                return "UNKNOWN";
+    private void setUpAdapter(String selected) {
+        switch (selected) {
+            case "Zip":
+                FilesAdapter filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
+                        R.layout.delegate_folder, zipList);
+                listView.setAdapter(filesAdapter);
+                break;
+            case "Document":
+                filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
+                        R.layout.delegate_folder, documentList);
+                listView.setAdapter(filesAdapter);
+                break;
+            case "E-Book":
+                filesAdapter = new FilesAdapter(getActivity().getApplicationContext(),
+                        R.layout.delegate_folder, eBook);
+                listView.setAdapter(filesAdapter);
+                break;
         }
+        adapter.notifyDataSetChanged();
     }
 
     private class Adapter extends ArrayAdapter<ArrayList<String>> {
 
-        private ArrayList<String> mFoldersList;
+        private ArrayList<String> folderList;
         private ViewHolder viewHolder;
 
-        Adapter(Context context, int resource, ArrayList<String> mFoldersList) {
+        Adapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
-            this.mFoldersList = mFoldersList;
+            this.folderList = folderList;
         }
 
-        @NonNull
         @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_folder, parent, false);
@@ -177,19 +150,19 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
-            if (mFoldersList.get(position).endsWith(TITLE_ZIP)) {
+            if (folderList.get(position).endsWith("Zip")) {
                 viewHolder.folderImage.setImageResource(R.mipmap.zip);
-            } else if (mFoldersList.get(position).endsWith(TITLE_DOCUMENT)) {
+            } else if (folderList.get(position).endsWith("Document")) {
                 viewHolder.folderImage.setImageResource(R.mipmap.document);
-            } else if (mFoldersList.get(position).endsWith(TITLE_EBOOK)) {
+            } else if (folderList.get(position).endsWith("E-Book")) {
                 viewHolder.folderImage.setImageResource(R.mipmap.ebook);
             }
-            if (mSelectedFolder == position) {
+            if (selectedFolder == position) {
                 viewHolder.relativeLayout.setBackgroundResource(R.drawable.grid_background);
             } else {
                 viewHolder.relativeLayout.setBackgroundResource(0);
             }
-            viewHolder.folderName.setText(mFoldersList.get(position));
+            viewHolder.folderName.setText(folderList.get(position));
 
             return convertView;
 
@@ -197,7 +170,7 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
 
         @Override
         public int getCount() {
-            return mFoldersList.size();
+            return folderList.size();
         }
     }
 
@@ -210,16 +183,15 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
 
     private class FilesAdapter extends ArrayAdapter<ArrayList<String>> {
 
-        private ArrayList<String> mFoldersList;
+        private ArrayList<String> folderList;
 
-        FilesAdapter(Context context, int resource, ArrayList<String> mFoldersList) {
+        FilesAdapter(Context context, int resource, ArrayList<String> folderList) {
             super(context, resource);
-            this.mFoldersList = mFoldersList;
+            this.folderList = folderList;
         }
 
-        @NonNull
         @Override
-        public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        public View getView(int position, View convertView, ViewGroup parent) {
             FilesHolder filesHolder;
             if (convertView == null) {
                 filesHolder = new FilesHolder();
@@ -233,9 +205,9 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
             } else {
                 filesHolder = (FilesHolder) convertView.getTag();
             }
-            File file = new File(mFoldersList.get(position));
+            File file = new File(folderList.get(position));
             filesHolder.fileName.setText(file.getName());
-            filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(),file.length()));
+            filesHolder.fileSize.setText(Formatter.formatFileSize(getActivity(), file.length()));
             if (ActivitySendFile.sendList.containsKey(file.getAbsolutePath())) {
                 filesHolder.mCheckBox.setVisibility(View.VISIBLE);
                 filesHolder.mCheckBox.setChecked(true);
@@ -251,7 +223,7 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
 
         @Override
         public int getCount() {
-            return mFoldersList.size();
+            return folderList.size();
         }
     }
 
@@ -275,33 +247,46 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    searchFolderRecursive(mPath);
+                    searchFolderRecursive(path);
                 }
             });
             return null;
         }
 
         private void searchFolderRecursive(File dir) {
+            String pdfPattern = ".pdf";
+            String txtPattern = ".txt";
+            String docPattern = ".doc";
+            String zipPattern = ".zip";
+
             File listFile[] = dir.listFiles();
-            for (File file : listFile) {
-                if (file.isDirectory()) {
-                    if (!file.getParentFile().getName().equals("Android"))
-                        searchFolderRecursive(file);
-                } else if (file.isFile()) {
-                    if (file.getName().endsWith(EXT_ZIP) && !mZipList.contains(file.toString())) {
-                        mZipList.add(file.toString());
-                        mAdapter.notifyDataSetChanged();
-                        publishProgress();
-                    } else if (file.getName().endsWith(EXT_PDF) || file.getName().endsWith(EXT_DOC)
-                            && !mDocumentsList.contains(file.toString())) {
-                        mDocumentsList.add(file.toString());
-                        mAdapter.notifyDataSetChanged();
-                        publishProgress();
-                    } else if (file.getName().endsWith(EXT_TXT)
-                            && mEBookList.contains(file.toString())) {
-                        mEBookList.add(file.toString());
-                        mAdapter.notifyDataSetChanged();
-                        publishProgress();
+
+            if (listFile != null) {
+                for (File aListFile : listFile) {
+                    if (aListFile.isDirectory()) {
+                        if (!aListFile.getParentFile().getName().equals("Android"))
+                            searchFolderRecursive(aListFile);
+                    } else {
+                        if (aListFile.getName().endsWith(pdfPattern) ||
+                                aListFile.getName().endsWith(txtPattern) ||
+                                aListFile.getName().endsWith(docPattern) ||
+                                aListFile.getName().endsWith(zipPattern)) {
+                            if (aListFile.getName().endsWith(".zip") &&
+                                    !zipList.contains(aListFile.toString())) {
+                                zipList.add(aListFile.toString());
+                                adapter.notifyDataSetChanged();
+                                publishProgress();
+                            } else if (aListFile.getName().endsWith(".pdf") ||
+                                    aListFile.getName().endsWith(".doc") && !documentList.contains(aListFile.toString())) {
+                                documentList.add(aListFile.toString());
+                                adapter.notifyDataSetChanged();
+                                publishProgress();
+                            } else if (aListFile.getName().endsWith(".txt") && eBook.contains(aListFile.toString())) {
+                                eBook.add(aListFile.toString());
+                                adapter.notifyDataSetChanged();
+                                publishProgress();
+                            }
+                        }
                     }
                 }
             }
@@ -310,8 +295,8 @@ public class FilesFragment extends Fragment implements AdapterView.OnItemClickLi
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            if (mAdapter != null) {
-                mAdapter.notifyDataSetChanged();
+            if (adapter != null) {
+                adapter.notifyDataSetChanged();
             }
         }
 

@@ -2,14 +2,13 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="50dp"
-    android:layout_marginBottom="50dp">
+    android:layout_marginBottom="50dp"
+    android:layout_marginTop="50dp">
 
     <GridView
         android:id="@+id/video_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:numColumns="4"/>
-
+        android:numColumns="4" />
 
 </FrameLayout>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/folder_background"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/folder_background"
     android:layout_margin="5dp"
     android:padding="5dp">
 
@@ -12,21 +12,23 @@
         android:gravity="center_horizontal"
         android:orientation="vertical">
 
-    <ImageView
-        android:src="@mipmap/folder"
-        android:layout_margin="5dp"
-        android:id="@+id/folder_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp" />
+        <ImageView
+            android:id="@+id/folder_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_margin="5dp"
+            android:src="@mipmap/folder" />
 
-    <TextView
-        android:id="@+id/folder_name"
-        android:layout_margin="5dp"
-        android:textStyle="bold"
-        android:text="folder name"
-        android:textAllCaps="false"
-        android:layout_width="wrap_content"
-        android:layout_height="40dp" />
+        <TextView
+            android:id="@+id/folder_name"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_margin="5dp"
+            android:maxLength="10"
+            android:maxLines="1"
+            android:text="folder name"
+            android:textAllCaps="false"
+            android:textStyle="bold" />
     </LinearLayout>
 
 </RelativeLayout>
