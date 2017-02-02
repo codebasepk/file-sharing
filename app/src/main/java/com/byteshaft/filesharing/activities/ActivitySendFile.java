@@ -35,6 +35,7 @@ public class ActivitySendFile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_send_file);
+        setTitle("Select Files");
         sInstance = this;
         sendList = new HashMap<>();
         SectionsPagerAdapter mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());

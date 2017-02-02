@@ -40,6 +40,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
     private TextView mUserName;
+    private TextView mStatusText;
     private String user;
     private Hotspot mHotspot;
     private PulsatorLayout pulsator;
@@ -66,9 +67,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 getApplicationContext()).getString("username", "User");
         pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-
+        mStatusText = (TextView) findViewById(R.id.tv_status);
         mUserName = (TextView) findViewById(R.id.user_name);
-        mUserName.setText(user);
+        mUserName.setText("Username: " + user);
         mHotspot = new Hotspot(getApplicationContext());
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -79,8 +80,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 return;
             } else {
                 Log.i("TAG", "settings else boolean " + mNotInitialized);
-                    incomingFileRequestThread.start();
-                    mNotInitialized = false;
+                incomingFileRequestThread.start();
+                mNotInitialized = false;
             }
         } else {
             incomingFileRequestThread.start();
@@ -159,15 +160,15 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                 alertDialogBuilder.setTitle("");
                                 alertDialogBuilder.setMessage(
                                         "Android 6.0 or above prohibits auto starting" +
-                                        " Wifi-hotspot. Please enable manually.").setCancelable(false)
+                                                " Wifi-hotspot. Please enable manually.").setCancelable(false)
                                         .setPositiveButton("Set", new DialogInterface.OnClickListener() {
                                             public void onClick(DialogInterface dialogInterface, int id) {
                                                 dialogInterface.dismiss();
                                                 mHotspot.createForM(Helpers.generateSSID(
                                                         user,
                                                         String.valueOf(serverSocket.getLocalPort())
-                                                ),
-                                                ActivityReceiveFile.this, OPEN_HOTSPOT);
+                                                        ),
+                                                        ActivityReceiveFile.this, OPEN_HOTSPOT);
                                             }
                                         });
                                 alertDialogBuilder.setNegativeButton("Quit", new DialogInterface.OnClickListener() {
@@ -177,8 +178,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                         ActivityReceiveFile.this.finish();
                                     }
                                 });
-                                    alertDialog = alertDialogBuilder.create();
-                                    alertDialog.show();
+                                alertDialog = alertDialogBuilder.create();
+                                alertDialog.show();
                             }
                         });
                     }
@@ -237,6 +238,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
+                                mStatusText.setText("Receiving Files..");
                                 mProgressBar.setProgress((int) ((float) mSent / mSize * 100));
                             }
                         });
@@ -246,6 +248,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            mStatusText.setText("All Done !!");
                             Toast.makeText(
                                     getApplicationContext(),
                                     outputFile.getAbsolutePath(),
@@ -253,10 +256,10 @@ public class ActivityReceiveFile extends AppCompatActivity {
                             ).show();
                         }
                     });
-                    if (jsonObject.optInt("currentFileNumber") == (jsonObject.optInt("filesCount")-1)) {
+                    if (jsonObject.optInt("currentFileNumber") == (jsonObject.optInt("filesCount") - 1)) {
                         ActivityReceiveFile.this.finish();
                     }
-                    Log.i("TAG", "current "+ jsonObject.optInt("currentFileNumber")
+                    Log.i("TAG", "current " + jsonObject.optInt("currentFileNumber")
                             + "Files count " + jsonObject.optInt("filesCount"));
                 }
             } catch (IOException e) {
