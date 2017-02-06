@@ -39,11 +39,9 @@ import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
-    private TextView mUserName;
     private TextView mStatusText;
     private String user;
     private Hotspot mHotspot;
-    private PulsatorLayout pulsator;
 
     private RoundCornerProgressBar mProgressBar;
     private TextView uploadDetails;
@@ -59,23 +57,21 @@ public class ActivityReceiveFile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_file);
-
         uploadDetails = (TextView) findViewById(R.id.file_number);
         mProgressBar = (RoundCornerProgressBar) findViewById(R.id.progressbar_Horizontal);
-
         user = PreferenceManager.getDefaultSharedPreferences(
                 getApplicationContext()).getString("username", "User");
-        pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
+        PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
         mStatusText = (TextView) findViewById(R.id.tv_status);
-        mUserName = (TextView) findViewById(R.id.user_name);
+        TextView mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText("Username: " + user);
         mHotspot = new Hotspot(getApplicationContext());
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             Log.i("TAG", "settings " + Settings.System.canWrite(getApplicationContext()));
             if (!Settings.System.canWrite(getApplicationContext())) {
-                startActivityForResult(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS), OPEN_SETTING);
+                startActivityForResult(
+                        new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS), OPEN_SETTING);
                 mNotInitialized = true;
             } else {
                 Log.i("TAG", "settings else boolean " + mNotInitialized);
@@ -110,15 +106,13 @@ public class ActivityReceiveFile extends AppCompatActivity {
             final Method method = manager.getClass().getDeclaredMethod("isWifiApEnabled");
             method.setAccessible(true); //in the case of visibility change in future APIs
             return (Boolean) method.invoke(manager);
-        } catch (final Throwable ignored) {
-        }
-
+        } catch (Throwable ignored) {}
         return false;
     }
 
     @Override
     protected void onPause() {
-        mHotspot.destroy(ActivityReceiveFile.this, CLOSE_HOTSPOT);
+        mHotspot.destroy(this, CLOSE_HOTSPOT);
         if (isSharingWiFi()) {
             finish();
         }
@@ -175,7 +169,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                     @Override
                                     public void onClick(DialogInterface dialogInterface, int i) {
                                         dialogInterface.dismiss();
-                                        ActivityReceiveFile.this.finish();
+                                        finish();
                                     }
                                 });
                                 alertDialog = alertDialogBuilder.create();
@@ -189,7 +183,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                 user,
                                 String.valueOf(serverSocket.getLocalPort())),
                                 ActivityReceiveFile.this, OPEN_HOTSPOT);
-
                     }
                 }
                 while (true) {
