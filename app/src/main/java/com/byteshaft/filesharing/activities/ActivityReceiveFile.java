@@ -248,7 +248,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            mStatusText.setText("All Done !!");
                             Toast.makeText(
                                     getApplicationContext(),
                                     outputFile.getAbsolutePath(),
@@ -257,6 +256,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         }
                     });
                     if (jsonObject.optInt("currentFileNumber") == (jsonObject.optInt("filesCount") - 1)) {
+                        mStatusText.setText("All Done !!");
                         ActivityReceiveFile.this.finish();
                     }
                     Log.i("TAG", "current " + jsonObject.optInt("currentFileNumber")
