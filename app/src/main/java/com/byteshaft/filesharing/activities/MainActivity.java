@@ -117,14 +117,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         alertDialog.setCancelable(false);
         mUsername = new EditText(MainActivity.this);
         mUsername.setHint("Enter your name..");
-
         mUsername.setFilters(FilterArray);
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT);
         mUsername.setLayoutParams(lp);
         alertDialog.setView(mUsername);
-
         alertDialog.setPositiveButton("OK",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
@@ -134,7 +132,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 });
-
         alertDialog.show();
     }
 
@@ -142,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public boolean validate() {
         boolean valid = true;
         name = mUsername.getText().toString();
-
         if (name.isEmpty() || name.length() < 4) {
             mUsername.setError("Enter minimum 4 characters");
             valid = false;

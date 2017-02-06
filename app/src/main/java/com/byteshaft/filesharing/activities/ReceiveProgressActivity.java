@@ -28,13 +28,10 @@ public class ReceiveProgressActivity extends AppCompatActivity {
         setContentView(R.layout.activity_receive_progress);
         file = new ArrayList<>();
         receiveFileList = (ListView) findViewById(R.id.receive_files_list);
-
-        // TODO: 06/02/2017 iterator file
         fileAdapter = new FileAdapter(getApplicationContext(), R.layout.delegate_receive_files, file);
         receiveFileList.setAdapter(fileAdapter);
 
     }
-
 
     class FileAdapter extends ArrayAdapter<String> {
 
@@ -65,7 +62,6 @@ public class ReceiveProgressActivity extends AppCompatActivity {
             viewHolder.fileName.setText(file.getName());
             viewHolder.fileUri.setText(file.toString());
             viewHolder.roundCornerProgressBar.setMax(100);
-//            viewHolder.roundCornerProgressBar.setProgress(progressHashMap.get(file.toString()));
             return convertView;
         }
 

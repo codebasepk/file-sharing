@@ -77,7 +77,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
             if (!Settings.System.canWrite(getApplicationContext())) {
                 startActivityForResult(new Intent(Settings.ACTION_MANAGE_WRITE_SETTINGS), OPEN_SETTING);
                 mNotInitialized = true;
-                return;
             } else {
                 Log.i("TAG", "settings else boolean " + mNotInitialized);
                 incomingFileRequestThread.start();
@@ -106,7 +105,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
 
     public static boolean isSharingWiFi() {
         try {
-            WifiManager manager = (WifiManager) AppGlobals.getContext().getSystemService(Context.WIFI_SERVICE);
+            WifiManager manager = (WifiManager) AppGlobals.getContext().getSystemService(
+                    Context.WIFI_SERVICE);
             final Method method = manager.getClass().getDeclaredMethod("isWifiApEnabled");
             method.setAccessible(true); //in the case of visibility change in future APIs
             return (Boolean) method.invoke(manager);
