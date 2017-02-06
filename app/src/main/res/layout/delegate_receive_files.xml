@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp">
+
+    <TextView
+        android:id="@+id/received_file_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_toLeftOf="@+id/button_open"
+        android:maxLength="10"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:text="File Name"
+        android:textColor="@color/background_color"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/received_file_uri"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/received_file_name"
+        android:layout_toLeftOf="@+id/button_open"
+        android:maxLength="10"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:text="file location"
+        android:textColor="@color/background_color"
+        android:textSize="12sp"
+        android:textStyle="italic" />
+
+    <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+        android:id="@+id/pb_receive"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/received_file_uri"
+        android:layout_marginTop="4dp"
+        android:layout_toLeftOf="@+id/button_open"
+        app:rcBackgroundColor="#303F9F"
+        app:rcBackgroundPadding="5dp"
+        app:rcProgressColor="#4CAF50"
+        app:rcRadius="10dp"
+        app:rcReverse="false" />
+
+    <Button
+        android:id="@+id/button_open"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="5dp"
+        android:background="@drawable/rounded_button"
+        android:text="open"
+        android:textColor="@android:color/white" />
+
+</RelativeLayout>
