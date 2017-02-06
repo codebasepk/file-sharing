@@ -85,7 +85,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                     PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
-            //After this point you wait for callback in onRequestPermissionsResult(int, String[], int[]) overriden method
         } else {
             if (locationEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 mWifiManager.startScan();
@@ -105,23 +104,18 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 dialog.setPositiveButton("Turn on", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                        // TODO Auto-generated method stub
                         Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivityForResult(myIntent, LOCATION_OFF);
-                        //get gps
                     }
                 });
                 dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                        // TODO Auto-generated method stub
-
                     }
                 });
                 dialog.show();
             }
-            //do something, permission was previously granted; or legacy device
         }
     }
 
@@ -143,18 +137,13 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         dialog.setPositiveButton("Turn on", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                // TODO Auto-generated method stub
                                 Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                                 startActivityForResult(myIntent, LOCATION_OFF);
-                                //get gps
                             }
                         });
                         dialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-
                             @Override
                             public void onClick(DialogInterface paramDialogInterface, int paramInt) {
-                                // TODO Auto-generated method stub
-
                             }
                         });
                         dialog.show();
@@ -196,8 +185,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     protected void onResume() {
         super.onResume();
         foreground = true;
-//        registerReceiver(
-//                wifiStateReceiver, new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
     }
 
     @Override
@@ -205,7 +192,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         super.onPause();
         foreground = false;
         try {
-//            unregisterReceiver(wifiStateReceiver);
             unregisterReceiver(mWifiScanReceiver);
         } catch (IllegalArgumentException ignore) {
 
@@ -299,7 +285,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     int count = 0;
                     for (HashMap<String, String> fileItem : ActivitySendFile.sendList.values()) {
                         count++;
-                        System.out.println("LOOOOOOOOOOOOOOOPER");
                         sendFileOverNetwork(
                                 hostIP,
                                 Helpers.decodeString(mPeer.SSID.split("-")[2]),
@@ -369,9 +354,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         }
                     }
                 }
-//                System.out.println(progress);
             }
-            //Closing socket
             sock.close();
         } catch (IOException e) {
             exception = true;
@@ -492,25 +475,6 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             }
             if (!connected) {
                 handler.postDelayed(this, 1000);
-            }
-        }
-    };
-
-    private BroadcastReceiver wifiStateReceiver = new BroadcastReceiver() {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.getAction().equals(WifiManager.NETWORK_STATE_CHANGED_ACTION)) {
-                NetworkInfo networkInfo =
-                        intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
-                WifiManager wifiManager = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
-                WifiInfo info = wifiManager.getConnectionInfo();
-                System.out.println("ACTION ");
-                if (ConnectivityManager.TYPE_WIFI == networkInfo.getType() &&
-                        networkInfo.isConnected() && mPeer != null && mConnectionRequested
-                        && info.getSSID().replaceAll("\"", "").trim().equals(mPeer.SSID.trim())) {
-                    mConnectionRequested = false;
-                }
             }
         }
     };
