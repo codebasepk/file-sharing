@@ -13,7 +13,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.byteshaft.filesharing.R;
@@ -207,20 +206,13 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     mSent = 0;
                     mSize = size;
                     byte[] buffer = new byte[8192];
-                    System.out.println(jsonObject);
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            uploadDetails.setText(
-                                    jsonObject.optString("currentFileNumber")
-                                            + "/" + jsonObject.optString("filesCount"));
-
-                        }
-                    });
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
+                            uploadDetails.setText(jsonObject.optString("currentFileNumber")
+                                    + "/" + jsonObject.optString("filesCount"));
                             mProgressBar.setMax(100);
+
                         }
                     });
                     while (size > 0 && (bytesRead = clientData.read(
@@ -238,22 +230,10 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     }
                     output.flush();
                     output.close();
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(
-                                    getApplicationContext(),
-                                    outputFile.getAbsolutePath(),
-                                    Toast.LENGTH_SHORT
-                            ).show();
-                        }
-                    });
                     if (jsonObject.optInt("currentFileNumber") == (jsonObject.optInt("filesCount") - 1)) {
                         mStatusText.setText("All Done !!");
-                        ActivityReceiveFile.this.finish();
+                        finish();
                     }
-                    Log.i("TAG", "current " + jsonObject.optInt("currentFileNumber")
-                            + "Files count " + jsonObject.optInt("filesCount"));
                 }
             } catch (IOException e) {
                 e.printStackTrace();
