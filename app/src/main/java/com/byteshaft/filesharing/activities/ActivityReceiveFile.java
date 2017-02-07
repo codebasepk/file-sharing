@@ -35,7 +35,7 @@ import java.net.Socket;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-public class ActivityReceiveFile extends AppCompatActivity {
+public class ActivityReceiveFile extends ReceiveProgressActivity {
 
     private boolean mNotInitialized;
     private TextView mStatusText;
@@ -199,6 +199,13 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     if (!mainDirectory.exists()) {
                         mainDirectory.mkdirs();
                     }
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            startActivity(new Intent(getApplicationContext(),
+                                    ReceiveProgressActivity.class));
+                        }
+                    });
                     final File outputFile = new File(
                             mainDirectory.getAbsolutePath() + "/" + jsonObject.optString("name"));
                     OutputStream output = new FileOutputStream(outputFile);
@@ -224,7 +231,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
                             @Override
                             public void run() {
                                 mStatusText.setText("Receiving Files..");
-                                mProgressBar.setProgress((int) ((float) mSent / mSize * 100));
+                                receiveProgressHashMap.put(outputFile.getAbsolutePath(), (int)
+                                        ((float) mSent / mSize * 100));
+                                fileAdapter.notifyDataSetChanged();
                             }
                         });
                     }
