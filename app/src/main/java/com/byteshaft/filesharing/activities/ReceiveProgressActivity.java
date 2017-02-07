@@ -15,18 +15,21 @@ import com.byteshaft.filesharing.R;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class ReceiveProgressActivity extends AppCompatActivity {
 
     private ListView receiveFileList;
-    private FileAdapter fileAdapter;
+    public FileAdapter fileAdapter;
     private ArrayList<String> file;
+    public HashMap<String, Integer> receiveProgressHashMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_progress);
         file = new ArrayList<>();
+        receiveProgressHashMap = new HashMap<>();
         receiveFileList = (ListView) findViewById(R.id.receive_files_list);
         fileAdapter = new FileAdapter(getApplicationContext(), R.layout.delegate_receive_files, file);
         receiveFileList.setAdapter(fileAdapter);
@@ -61,7 +64,7 @@ public class ReceiveProgressActivity extends AppCompatActivity {
             File file = new File(toBeReceived.get(position));
             viewHolder.fileName.setText(file.getName());
             viewHolder.fileUri.setText(file.toString());
-            viewHolder.roundCornerProgressBar.setMax(100);
+            viewHolder.roundCornerProgressBar.setProgress(receiveProgressHashMap.get(file.getAbsolutePath()));
             return convertView;
         }
 
