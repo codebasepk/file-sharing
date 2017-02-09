@@ -32,10 +32,12 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
+import java.util.Map;
 
 import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 
-public class ActivityReceiveFile extends ReceiveProgressActivity {
+public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
     private TextView mStatusText;
@@ -111,10 +113,10 @@ public class ActivityReceiveFile extends ReceiveProgressActivity {
 
     @Override
     protected void onPause() {
-        mHotspot.destroy(this, CLOSE_HOTSPOT);
-        if (isSharingWiFi()) {
-            finish();
-        }
+//        mHotspot.destroy(this, CLOSE_HOTSPOT);
+//        if (isSharingWiFi()) {
+//            finish();
+//        }
         super.onPause();
     }
 
@@ -202,12 +204,16 @@ public class ActivityReceiveFile extends ReceiveProgressActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            startActivity(new Intent(getApplicationContext(),
-                                    ReceiveProgressActivity.class));
+                            if (ReceiveProgressActivity.getInstance() == null) {
+                                startActivity(new Intent(getApplicationContext(),
+                                        ReceiveProgressActivity.class));
+                            }
                         }
                     });
+                    Thread.sleep(500);
                     final File outputFile = new File(
                             mainDirectory.getAbsolutePath() + "/" + jsonObject.optString("name"));
+                    ReceiveProgressActivity.getInstance().file.add(outputFile.getAbsolutePath());
                     OutputStream output = new FileOutputStream(outputFile);
                     long size = clientData.readLong();
                     mSent = 0;
@@ -216,9 +222,9 @@ public class ActivityReceiveFile extends ReceiveProgressActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            uploadDetails.setText(jsonObject.optString("currentFileNumber")
-                                    + "/" + jsonObject.optString("filesCount"));
-                            mProgressBar.setMax(100);
+//                            uploadDetails.setText(jsonObject.optString("currentFileNumber")
+//                                    + "/" + jsonObject.optString("filesCount"));
+//                            mProgressBar.setMax(100);
 
                         }
                     });
@@ -231,22 +237,37 @@ public class ActivityReceiveFile extends ReceiveProgressActivity {
                             @Override
                             public void run() {
                                 mStatusText.setText("Receiving Files..");
-                                receiveProgressHashMap.put(outputFile.getAbsolutePath(), (int)
+                                ReceiveProgressActivity.getInstance().receiveProgressHashMap.put(outputFile.getAbsolutePath(), (int)
                                         ((float) mSent / mSize * 100));
-                                fileAdapter.notifyDataSetChanged();
+                                Log.i("TAG", "arraylist " + ReceiveProgressActivity.getInstance().file);
+                                Log.i("TAG", "hashmap " + ReceiveProgressActivity.getInstance().receiveProgressHashMap);
+                                ReceiveProgressActivity.getInstance().fileAdapter.notifyDataSetChanged();
                             }
                         });
                     }
                     output.flush();
                     output.close();
                     if (jsonObject.optInt("currentFileNumber") == (jsonObject.optInt("filesCount") - 1)) {
-                        mStatusText.setText("All Done !!");
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mStatusText.setText("All Done !!");
+                            }
+                        });
+                        Iterator entries = ReceiveProgressActivity.getInstance().receiveProgressHashMap.entrySet().iterator();
+                        while (entries.hasNext()) {
+                            Map.Entry thisEntry = (Map.Entry) entries.next();
+                            Object key = thisEntry.getKey();
+                            ReceiveProgressActivity.getInstance().receiveProgressHashMap.put(key.toString(), 100);
+                        }
                         finish();
                     }
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             } catch (JSONException e) {
+                e.printStackTrace();
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
