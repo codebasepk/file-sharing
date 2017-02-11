@@ -57,7 +57,7 @@ public class ReceiveProgressActivity extends AppCompatActivity {
         private ArrayList<String> toBeReceived;
 
 
-        public FileAdapter(Context context, int resource, ArrayList<String> toBeReceived) {
+        FileAdapter(Context context, int resource, ArrayList<String> toBeReceived) {
             super(context, resource);
             this.toBeReceived = toBeReceived;
         }
@@ -90,7 +90,8 @@ public class ReceiveProgressActivity extends AppCompatActivity {
                         intent.setAction(Intent.ACTION_VIEW);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            Uri contentUri = FileProvider.getUriForFile(getContext(), "com.byteshaft.filesharing.fileProvider", file);
+                            Uri contentUri = FileProvider.getUriForFile(
+                                    getContext(), "com.byteshaft.filesharing.provider", file);
                             intent.setDataAndType(contentUri, type);
                         } else {
                             intent.setDataAndType(Uri.fromFile(file), type);
@@ -99,44 +100,9 @@ public class ReceiveProgressActivity extends AppCompatActivity {
                     } catch (ActivityNotFoundException anfe) {
                         Toast.makeText(getContext(), "No activity found to open this attachment.", Toast.LENGTH_LONG).show();
                     }
-//                    File file = new File(toBeReceived.get(position));
-//                    Uri uri_path = Uri.fromFile(file);
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                        uri_path = FileProvider.getUriForFile(getApplicationContext(),
-//                                BuildConfig.APPLICATION_ID + ".provider", file);
-//                    }
-//                    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension
-//                            (MimeTypeMap.getFileExtensionFromUrl(toBeReceived.get(position)));
-//                    Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-//                        Uri contentUri = FileProvider.getUriForFile(getApplicationContext(), getApplicationContext().getPackageName(), file);
-//                        intent.setDataAndType(contentUri, mimeType);
-//                    } else {
-//                        intent.setDataAndType(uri_path, mimeType);
-//                    }
-//                    startActivity(intent);
                 }
             });
             return convertView;
-        }
-
-        private String getMimeType(Context context, Uri uri) {
-            String extension;
-
-            //Check uri format to avoid null
-            if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
-                //If scheme is a content
-                final MimeTypeMap mime = MimeTypeMap.getSingleton();
-                extension = mime.getExtensionFromMimeType(context.getContentResolver().getType(uri));
-            } else {
-                //If scheme is a File
-                //This will replace white spaces with %20 and also other special characters. This will avoid returning null values on file name with spaces and special characters.
-                extension = MimeTypeMap.getFileExtensionFromUrl(Uri.fromFile(new File(uri.getPath())).toString());
-
-            }
-
-            return extension;
         }
 
         @Override
