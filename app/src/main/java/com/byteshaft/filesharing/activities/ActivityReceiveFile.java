@@ -44,9 +44,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
     private String user;
     private Hotspot mHotspot;
 
-    private RoundCornerProgressBar mProgressBar;
-    private TextView uploadDetails;
-
     private long mSize;
     private long mSent;
     private static final int OPEN_SETTING = 0;
@@ -58,8 +55,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_file);
-        uploadDetails = (TextView) findViewById(R.id.file_number);
-        mProgressBar = (RoundCornerProgressBar) findViewById(R.id.progressbar_Horizontal);
         user = PreferenceManager.getDefaultSharedPreferences(
                 getApplicationContext()).getString("username", "User");
         PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
@@ -107,17 +102,9 @@ public class ActivityReceiveFile extends AppCompatActivity {
             final Method method = manager.getClass().getDeclaredMethod("isWifiApEnabled");
             method.setAccessible(true); //in the case of visibility change in future APIs
             return (Boolean) method.invoke(manager);
-        } catch (Throwable ignored) {}
+        } catch (Throwable ignored) {
+        }
         return false;
-    }
-
-    @Override
-    protected void onPause() {
-//        mHotspot.destroy(this, CLOSE_HOTSPOT);
-//        if (isSharingWiFi()) {
-//            finish();
-//        }
-        super.onPause();
     }
 
     @Override
@@ -219,15 +206,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     mSent = 0;
                     mSize = size;
                     byte[] buffer = new byte[8192];
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-//                            uploadDetails.setText(jsonObject.optString("currentFileNumber")
-//                                    + "/" + jsonObject.optString("filesCount"));
-//                            mProgressBar.setMax(100);
-
-                        }
-                    });
                     while (size > 0 && (bytesRead = clientData.read(
                             buffer, 0, (int) Math.min(buffer.length, size))) != -1) {
                         output.write(buffer, 0, bytesRead);
@@ -239,8 +217,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                 mStatusText.setText("Receiving Files..");
                                 ReceiveProgressActivity.getInstance().receiveProgressHashMap.put(outputFile.getAbsolutePath(), (int)
                                         ((float) mSent / mSize * 100));
-                                Log.i("TAG", "arraylist " + ReceiveProgressActivity.getInstance().file);
-                                Log.i("TAG", "hashmap " + ReceiveProgressActivity.getInstance().receiveProgressHashMap);
                                 ReceiveProgressActivity.getInstance().fileAdapter.notifyDataSetChanged();
                             }
                         });
