@@ -2,39 +2,48 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/customshape"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_margin="10dp">
+
+    <com.github.siyamed.shapeimageview.CircularImageView
+        android:id="@+id/place_holder"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_margin="8dp"
+        android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:id="@+id/file_name"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@color/background_color"
-        android:padding="5dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/place_holder"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:padding="5dp"
+        android:text="File Name"
+        android:textColor="@color/background_color"
+        android:textSize="20sp"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/file_uri"
-        android:textStyle="italic"
-        android:textSize="12sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/file_name"
-        android:textColor="@color/background_color"
+        android:layout_toRightOf="@+id/place_holder"
+        android:ellipsize="marquee"
+        android:maxLines="1"
         android:padding="5dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:text="File Location"
+        android:textColor="@color/background_color"
+        android:textSize="12sp"
+        android:textStyle="italic" />
 
-    <com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar
+    <ProgressBar
         android:id="@+id/progressbar_horizontal"
-        android:layout_below="@+id/file_uri"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="10dp"
-        app:rcBackgroundColor="#303F9F"
-        app:rcBackgroundPadding="5dp"
-        app:rcProgressColor="#4CAF50"
-        app:rcRadius="10dp"
-        app:rcReverse="false" />
-
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/file_uri"
+        android:layout_margin="10dp" />
 
 </RelativeLayout>

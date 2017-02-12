@@ -2,21 +2,19 @@ package com.byteshaft.filesharing.activities;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.byteshaft.filesharing.R;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -88,9 +86,9 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.fileName = (TextView) convertView.findViewById(R.id.file_name);
                 viewHolder.fileUri = (TextView) convertView.findViewById(R.id.file_uri);
-                viewHolder.roundCornerProgressBar = (RoundCornerProgressBar) convertView.findViewById(R.id.progressbar_horizontal);
+                viewHolder.roundCornerProgressBar = (ProgressBar) convertView.findViewById(R.id.progressbar_horizontal);
                 convertView.setTag(viewHolder);
-            }else {
+            } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
             File file = new File(toBeSend.get(position));
@@ -110,7 +108,7 @@ public class SendProgressActivity extends PlaceholderPeersActivity {
     class ViewHolder {
         TextView fileName;
         TextView fileUri;
-        RoundCornerProgressBar roundCornerProgressBar;
+        ProgressBar roundCornerProgressBar;
 
     }
 }

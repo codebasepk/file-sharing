@@ -14,7 +14,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
 import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.utils.AppGlobals;
 import com.byteshaft.filesharing.utils.Helpers;
@@ -218,6 +217,10 @@ public class ActivityReceiveFile extends AppCompatActivity {
                                 ReceiveProgressActivity.getInstance().receiveProgressHashMap.put(outputFile.getAbsolutePath(), (int)
                                         ((float) mSent / mSize * 100));
                                 ReceiveProgressActivity.getInstance().fileAdapter.notifyDataSetChanged();
+                                ReceiveProgressActivity.getInstance().currentFileCounter.setText(
+                                        jsonObject.optString("currentFileNumber"));
+                                ReceiveProgressActivity.getInstance().totalFileCounter.setText(
+                                        jsonObject.optString("filesCount"));
                             }
                         });
                     }
