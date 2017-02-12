@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
+import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -143,7 +144,7 @@ public class FilesFragment extends Fragment {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_folder, parent, false);
-                viewHolder.folderImage = (ImageView) convertView.findViewById(R.id.folder_image);
+                viewHolder.folderImage = (CircularImageView) convertView.findViewById(R.id.folder_image);
                 viewHolder.folderName = (TextView) convertView.findViewById(R.id.folder_name);
                 viewHolder.relativeLayout = (RelativeLayout) convertView.findViewById(R.id.folder_background);
                 convertView.setTag(viewHolder);
@@ -176,7 +177,7 @@ public class FilesFragment extends Fragment {
 
     private class ViewHolder {
         TextView folderName;
-        ImageView folderImage;
+        CircularImageView folderImage;
         RelativeLayout relativeLayout;
 
     }

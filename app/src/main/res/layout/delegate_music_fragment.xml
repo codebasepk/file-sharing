@@ -6,15 +6,15 @@
     android:layout_centerInParent="true"
     android:layout_margin="2dp">
 
-    <ImageView
+    <com.github.siyamed.shapeimageview.CircularImageView
         android:id="@+id/music_image"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@mipmap/ic_music_image"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="2dp"
         android:layout_marginRight="2dp"
-        android:scaleType="centerCrop"
-        android:src="@mipmap/ic_music_image" />
+        android:scaleType="centerCrop" />
 
     <CheckBox
         android:id="@+id/music_checkbox"

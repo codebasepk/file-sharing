@@ -25,5 +25,4 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.2.0'
     compile 'pl.bclogic:pulsator4droid:1.0.3'
     compile 'com.github.siyamed:android-shape-imageview:0.9.+@aar'
-    compile 'com.akexorcist:RoundCornerProgressBar:2.0.3'
 }

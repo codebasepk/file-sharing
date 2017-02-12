@@ -1,7 +1,6 @@
 package com.byteshaft.filesharing.activities;
 
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -9,18 +8,16 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.akexorcist.roundcornerprogressbar.RoundCornerProgressBar;
-import com.byteshaft.filesharing.BuildConfig;
 import com.byteshaft.filesharing.R;
 
 import java.io.File;
@@ -31,9 +28,11 @@ public class ReceiveProgressActivity extends AppCompatActivity {
 
     private ListView receiveFileList;
     public FileAdapter fileAdapter;
-    public   ArrayList<String> file;
+    public ArrayList<String> file;
     public HashMap<String, Integer> receiveProgressHashMap;
     private static ReceiveProgressActivity sInstance;
+    public TextView currentFileCounter;
+    public TextView totalFileCounter;
 
     public static ReceiveProgressActivity getInstance() {
         return sInstance;
@@ -44,6 +43,8 @@ public class ReceiveProgressActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_receive_progress);
         sInstance = this;
+        currentFileCounter = (TextView) findViewById(R.id.remaining_counter);
+        totalFileCounter = (TextView) findViewById(R.id.total_counter);
         file = new ArrayList<>();
         receiveProgressHashMap = new HashMap<>();
         receiveFileList = (ListView) findViewById(R.id.receive_files_list);
@@ -69,15 +70,15 @@ public class ReceiveProgressActivity extends AppCompatActivity {
                 viewHolder = new ViewHolder();
                 viewHolder.openFileButton = (Button) convertView.findViewById(R.id.button_open);
                 viewHolder.fileName = (TextView) convertView.findViewById(R.id.received_file_name);
-                viewHolder.roundCornerProgressBar = (RoundCornerProgressBar) convertView.findViewById(R.id.pb_receive);
+                viewHolder.roundCornerProgressBar = (ProgressBar) convertView.findViewById(R.id.pb_receive);
                 convertView.setTag(viewHolder);
             } else {
                 viewHolder = (ViewHolder) convertView.getTag();
             }
 
             File file = new File(toBeReceived.get(position));
-            viewHolder.fileName.setText(file.getName());
             viewHolder.roundCornerProgressBar.setProgress(receiveProgressHashMap.get(file.getAbsolutePath()));
+            viewHolder.fileName.setText(file.getName());
             viewHolder.openFileButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -114,7 +115,6 @@ public class ReceiveProgressActivity extends AppCompatActivity {
     private class ViewHolder {
         Button openFileButton;
         TextView fileName;
-        RoundCornerProgressBar roundCornerProgressBar;
-
+        ProgressBar roundCornerProgressBar;
     }
 }

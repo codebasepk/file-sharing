@@ -18,5 +18,10 @@
         <item name="android:textColor">@color/button_text_color</item>
     </style>
 
+    <style name="AppTheme.ButtonGray" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@android:color/darker_gray</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 </resources>

@@ -20,6 +20,7 @@ import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
 import com.byteshaft.filesharing.utils.ThumbnailCreationTask;
+import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -128,7 +129,7 @@ public class VideosFragment extends Fragment {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_video_fragment, parent, false);
-                viewHolder.videoImage = (ImageView) convertView.findViewById(R.id.folder_video);
+                viewHolder.videoImage = (CircularImageView) convertView.findViewById(R.id.folder_video);
                 viewHolder.checkbox = (CheckBox) convertView.findViewById(R.id.videos_checkbox);
                 viewHolder.position = position;
                 convertView.setTag(viewHolder);
@@ -155,7 +156,7 @@ public class VideosFragment extends Fragment {
 
     public class ViewHolder {
         public int position;
-        public ImageView videoImage;
+        public CircularImageView videoImage;
         public CheckBox checkbox;
     }
 }

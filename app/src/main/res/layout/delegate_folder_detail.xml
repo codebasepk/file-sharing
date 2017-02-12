@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:weightSum="6">
 
-    <ImageView
+    <com.github.siyamed.shapeimageview.CircularImageView
         android:id="@+id/file_image"
         android:layout_width="0dp"
         android:layout_height="70dp"

@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#344989</color>
-    <color name="colorAccent">#607D8B</color>
+    <color name="colorAccent">#03a9f4</color>
 
     <color name="background_color">#3a5199</color>
     <color name="reg_bg_color">#e1e6ea</color>
@@ -10,5 +10,5 @@
     <color name="button_color">#03a9f4</color>
     <color name="button_text_color">#ffffff</color>
 
-    <color name="transparen_tab_color">#0D03a9f4</color>
+    <color name="transparent_tab_color">#D7D7D7</color>
 </resources>

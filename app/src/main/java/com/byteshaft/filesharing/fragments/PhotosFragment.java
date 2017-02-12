@@ -14,11 +14,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
-import android.widget.ImageView;
 
 import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
+import com.github.siyamed.shapeimageview.CircularImageView;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -84,18 +84,18 @@ public class PhotosFragment extends Fragment {
         }
     }
 
-    public  void getAllShownImages() {
+    public void getAllShownImages() {
         Uri uri;
         Cursor cursor;
         int column_index_data;
         String absolutePathOfImage;
         uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
-        String[] projection = { MediaStore.MediaColumns.DATA,
-                MediaStore.Images.Media.BUCKET_DISPLAY_NAME };
+        String[] projection = {MediaStore.MediaColumns.DATA,
+                MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
 
         cursor = getActivity().getContentResolver().query(uri, projection, null,
-                null,  MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
+                null, MediaStore.Files.FileColumns.DATE_ADDED + " DESC");
 
         column_index_data = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
         while (cursor.moveToNext()) {
@@ -122,7 +122,7 @@ public class PhotosFragment extends Fragment {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_photo_fragment, parent, false);
-                viewHolder.folderImage = (ImageView) convertView.findViewById(R.id.folder_image);
+                viewHolder.folderImage = (CircularImageView) convertView.findViewById(R.id.folder_image);
                 viewHolder.photoCheckBox = (CheckBox) convertView.findViewById(R.id.photo_checkbox);
                 convertView.setTag(viewHolder);
             } else {
@@ -152,7 +152,7 @@ public class PhotosFragment extends Fragment {
     }
 
     private class ViewHolder {
-        ImageView folderImage;
+        CircularImageView folderImage;
         CheckBox photoCheckBox;
     }
 }
