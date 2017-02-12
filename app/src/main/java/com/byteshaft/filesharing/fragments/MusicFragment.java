@@ -12,12 +12,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.byteshaft.filesharing.R;
 import com.byteshaft.filesharing.activities.ActivitySendFile;
 import com.byteshaft.filesharing.utils.Helpers;
+import com.github.siyamed.shapeimageview.CircularImageView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -71,7 +71,7 @@ public class MusicFragment extends Fragment {
 
     private void getAudioList() {
         String[] acceptedExtensions = {
-                "mp3", "mp2", "wav", "flac", "ogg", "au" , "snd", "mid", "midi", "kar",
+                "mp3", "mp2", "wav", "flac", "ogg", "au", "snd", "mid", "midi", "kar",
                 "mga", "aif", "aiff", "aifc", "m3u", "oga", "spx"
         };
         String selection = MediaStore.Audio.Media.IS_MUSIC + " != 0";
@@ -95,10 +95,10 @@ public class MusicFragment extends Fragment {
                 null);
 
 
-        while(cursor.moveToNext()) {
+        while (cursor.moveToNext()) {
             String musicPath = cursor.getString(cursor
                     .getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
-            for (String music: acceptedExtensions) {
+            for (String music : acceptedExtensions) {
                 if (getFileExt(musicPath).contains(music)) {
                     musicList.add(musicPath);
                     adapter.notifyDataSetChanged();
@@ -126,7 +126,7 @@ public class MusicFragment extends Fragment {
             if (convertView == null) {
                 viewHolder = new ViewHolder();
                 convertView = getActivity().getLayoutInflater().inflate(R.layout.delegate_music_fragment, parent, false);
-                viewHolder.folderImage = (ImageView) convertView.findViewById(R.id.music_image);
+                viewHolder.folderImage = (CircularImageView) convertView.findViewById(R.id.music_image);
                 viewHolder.musicName = (TextView) convertView.findViewById(R.id.song_name);
                 viewHolder.musicCheckbox = (CheckBox) convertView.findViewById(R.id.music_checkbox);
                 convertView.setTag(viewHolder);
@@ -152,7 +152,7 @@ public class MusicFragment extends Fragment {
     }
 
     private class ViewHolder {
-        ImageView folderImage;
+        CircularImageView folderImage;
         TextView musicName;
         CheckBox musicCheckbox;
     }

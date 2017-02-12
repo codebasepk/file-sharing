@@ -182,7 +182,7 @@ public class ActivityReceiveFile extends AppCompatActivity {
                     File mainDirectory = new File(
                             Environment.getExternalStorageDirectory()
                                     + File.separator
-                                    + "FileShare"
+                                    + "iShare"
                                     + File.separator
                                     + jsonObject.optString("type"));
                     if (!mainDirectory.exists()) {

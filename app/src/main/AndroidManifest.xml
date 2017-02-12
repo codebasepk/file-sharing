@@ -15,8 +15,8 @@
     <permission
         android:name="com.company.app.fileprovider.READ"
         android:description="@string/perm_read"
-        android:label="@string/perm_read_label"/>
-    <uses-permission android:name="com.byteshaft.filesharing.fileprovider.READ"/>
+        android:label="@string/perm_read_label" />
+    <uses-permission android:name="com.byteshaft.filesharing.fileprovider.READ" />
 
     <application
         android:name=".utils.AppGlobals"
@@ -34,7 +34,7 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/provider_paths"/>
+                android:resource="@xml/provider_paths" />
         </provider>
 
 
@@ -50,7 +50,8 @@
         </activity>
         <activity
             android:name=".activities.ActivitySendFile"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activities.ActivityReceiveFile"
             android:screenOrientation="portrait"
@@ -62,7 +63,7 @@
         <activity
             android:name=".activities.SendProgressActivity"
             android:screenOrientation="portrait" />
-        <activity android:name=".activities.ReceiveProgressActivity"/>
+        <activity android:name=".activities.ReceiveProgressActivity" />
     </application>
 
 </manifest>

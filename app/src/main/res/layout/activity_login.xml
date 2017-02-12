@@ -4,8 +4,7 @@
     android:id="@+id/activity_login"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_color"
-    tools:context="com.byteshaft.filesharing.account.LoginActivity">
+    android:background="@color/background_color">
 
 
     <ScrollView

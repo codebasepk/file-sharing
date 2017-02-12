@@ -10,7 +10,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_toLeftOf="@+id/button_open"
-        android:maxLength="10"
         android:maxLines="1"
         android:padding="5dp"
         android:text="File Name"
@@ -52,8 +51,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="5dp"
-        android:background="@drawable/rounded_button"
-        android:text="open"
-        android:textColor="@android:color/white" />
+        android:theme="@style/AppTheme.ButtonGray"
+        android:text="open" />
 
 </RelativeLayout>
