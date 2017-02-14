@@ -39,7 +39,6 @@ import pl.bclogic.pulsator4droid.library.PulsatorLayout;
 public class ActivityReceiveFile extends AppCompatActivity {
 
     private boolean mNotInitialized;
-    private TextView mStatusText;
     private String user;
     private Hotspot mHotspot;
 
@@ -58,7 +57,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                 getApplicationContext()).getString("username", "User");
         PulsatorLayout pulsator = (PulsatorLayout) findViewById(R.id.pulsator);
         pulsator.start();
-        mStatusText = (TextView) findViewById(R.id.tv_status);
         TextView mUserName = (TextView) findViewById(R.id.user_name);
         mUserName.setText("Username: " + user);
         mHotspot = new Hotspot(getApplicationContext());
@@ -213,7 +211,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mStatusText.setText("Receiving Files..");
                                 ReceiveProgressActivity.getInstance().receiveProgressHashMap.put(outputFile.getAbsolutePath(), (int)
                                         ((float) mSent / mSize * 100));
                                 ReceiveProgressActivity.getInstance().fileAdapter.notifyDataSetChanged();
@@ -230,7 +227,6 @@ public class ActivityReceiveFile extends AppCompatActivity {
                         runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                mStatusText.setText("All Done !!");
                             }
                         });
                         Iterator entries = ReceiveProgressActivity.getInstance().receiveProgressHashMap.entrySet().iterator();

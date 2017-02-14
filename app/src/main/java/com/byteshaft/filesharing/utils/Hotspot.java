@@ -1,12 +1,11 @@
 package com.byteshaft.filesharing.utils;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
-import android.os.Build;
-import android.provider.Settings;
 import android.util.Log;
 
 import java.lang.reflect.Method;
@@ -52,7 +51,8 @@ public class Hotspot {
             Method setWifiApMethod = mWifiManager.getClass().getMethod(
                     "setWifiApEnabled", WifiConfiguration.class, boolean.class);
             setWifiApMethod.invoke(mWifiManager, netConfig, true);
-            while (!isAPCreated()) {}
+            while (!isAPCreated()) {
+            }
         } catch (java.lang.reflect.InvocationTargetException e) {
             if (e.getCause().getMessage().contains("android.permission.CONNECTIVITY_INTERNAL")) {
                 createForM(name, activity, CODE);
@@ -62,7 +62,7 @@ public class Hotspot {
         }
     }
 
-    public void createForM(String name, Activity activity , int CODE) {
+    public void createForM(String name, Activity activity, int CODE) {
         try {
             WifiManager wifiManager = (WifiManager) AppGlobals.getContext().getSystemService(
                     Context.WIFI_SERVICE);
@@ -76,12 +76,14 @@ public class Hotspot {
             Method setConfigMethod = wifiManager.getClass().getMethod(
                     "setWifiApConfiguration", WifiConfiguration.class);
             setConfigMethod.invoke(wifiManager, wifiConfig);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        Intent intent = new Intent();
-        intent.setAction(Settings.ACTION_WIRELESS_SETTINGS);
+        Intent intent = new Intent(Intent.ACTION_MAIN, null);
+        intent.addCategory(Intent.CATEGORY_LAUNCHER);
+        final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
+        intent.setComponent(cn);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivityForResult(intent, CODE);
     }
 
@@ -97,8 +99,11 @@ public class Hotspot {
                     @Override
                     public void run() {
                         if (isSharingWiFi()) {
-                            Intent intent = new Intent();
-                            intent.setAction(Settings.ACTION_WIRELESS_SETTINGS);
+                            Intent intent = new Intent(Intent.ACTION_MAIN, null);
+                            intent.addCategory(Intent.CATEGORY_LAUNCHER);
+                            final ComponentName cn = new ComponentName("com.android.settings", "com.android.settings.TetherSettings");
+                            intent.setComponent(cn);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             activity.startActivityForResult(intent, CLOSE_HOTSPOT);
                         } else {
                             activity.onBackPressed();
