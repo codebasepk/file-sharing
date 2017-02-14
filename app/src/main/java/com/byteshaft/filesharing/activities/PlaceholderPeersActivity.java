@@ -47,6 +47,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static com.byteshaft.filesharing.utils.Helpers.intToInetAddress;
 import static com.byteshaft.filesharing.utils.Helpers.locationEnabled;
@@ -67,6 +68,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     public static HashMap<String, Integer> progressHashMap;
     private boolean foreground = false;
     private boolean connected = true;
+    private long scanStartTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,11 +89,13 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     PERMISSIONS_REQUEST_CODE_ACCESS_COARSE_LOCATION);
         } else {
             if (locationEnabled() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                scanStartTime = System.currentTimeMillis();
                 mWifiManager.startScan();
                 mRadarView = (RadarView) findViewById(R.id.radarView);
                 mRadarView.setShowCircles(true);
                 startAnimation(mRadarView);
             } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                scanStartTime = System.currentTimeMillis();
                 mWifiManager.startScan();
                 mRadarView = (RadarView) findViewById(R.id.radarView);
                 mRadarView.setShowCircles(true);
@@ -127,6 +131,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             // Do something with granted permission
 
             if (locationEnabled() || Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                scanStartTime = System.currentTimeMillis();
                 mWifiManager.startScan();
             } else {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -149,6 +154,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         dialog.show();
                     }
                 } else {
+                    scanStartTime = System.currentTimeMillis();
                     mWifiManager.startScan();
                     mRadarView = (RadarView) findViewById(R.id.radarView);
                     mRadarView.setShowCircles(true);
@@ -165,16 +171,13 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         switch (requestCode) {
             case LOCATION_OFF:
                 if (locationEnabled()) {
+                    scanStartTime = System.currentTimeMillis();
                     mWifiManager.startScan();
                     mRadarView = (RadarView) findViewById(R.id.radarView);
                     mRadarView.setShowCircles(true);
                     startAnimation(mRadarView);
                 }
         }
-    }
-
-    public void stopAnimation(View view) {
-        if (mRadarView != null) mRadarView.stopAnimation();
     }
 
     public void startAnimation(View view) {
@@ -205,7 +208,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 mScanRequested = false;
                 radarLayout = (FrameLayout) findViewById(R.id.radar_layout);
                 mResults = new HashMap<>();
-                List<ScanResult> mScanResults = mWifiManager.getScanResults();
+                final List<ScanResult> mScanResults = mWifiManager.getScanResults();
                 int index = 0;
                 for (ScanResult result : mScanResults) {
                     if (result.SSID.startsWith("SH-")) {
@@ -216,8 +219,18 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                     }
                 }
                 if (mResults.size() == 0) {
-                    mRefreshButton.setVisibility(View.VISIBLE);
-                    mRadarView.setVisibility(View.INVISIBLE);
+                    if (TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - scanStartTime) >= 10) {
+                        mRefreshButton.setVisibility(View.VISIBLE);
+                        mRadarView.setVisibility(View.INVISIBLE);
+                    } else {
+                        new android.os.Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                mScanRequested = true;
+                                mWifiManager.startScan();
+                            }
+                        }, 1000);
+                    }
                 }
             }
         }
@@ -303,10 +316,11 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_refresh_peers:
-                mScanRequested = true;
                 if (locationEnabled() && ActivityCompat.checkSelfPermission(getApplicationContext(),
                         Manifest.permission.ACCESS_COARSE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED) {
+                    mScanRequested = true;
+                    scanStartTime = System.currentTimeMillis();
                     mWifiManager.startScan();
                     mRadarView.setVisibility(View.VISIBLE);
                     mRefreshButton.setVisibility(View.INVISIBLE);
@@ -362,11 +376,11 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                 @Override
                 public void run() {
                     if (!completed && foreground)
-                    Toast.makeText(
-                            PlaceholderPeersActivity.this,
-                            "Please try again",
-                            Toast.LENGTH_SHORT
-                    ).show();
+                        Toast.makeText(
+                                PlaceholderPeersActivity.this,
+                                "Please try again",
+                                Toast.LENGTH_SHORT
+                        ).show();
                 }
             });
             Log.i("TAG", "exception");
@@ -409,7 +423,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
 
     }
 
-    public static NetworkInfo getNetworkInfo(Context context){
+    public static NetworkInfo getNetworkInfo(Context context) {
         ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         return cm.getActiveNetworkInfo();
     }
@@ -417,6 +431,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     private Handler handler = new Handler();
     private Runnable runnable = new Runnable() {
         int count = 0;
+
         public void run() {
             Log.i("TAG", "Running Handler");
             if (connected) {
@@ -450,7 +465,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                             PlaceholderPeersActivity.this.finish();
                             completed = true;
                             WifiConfiguration conf = new WifiConfiguration();
-                            String SSID =  mPeer.SSID;
+                            String SSID = mPeer.SSID;
                             conf.SSID = "\"" + SSID + "\"";
                             conf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
                             final WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
