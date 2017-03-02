@@ -234,8 +234,8 @@ public class ActivityReceiveFile extends AppCompatActivity {
                             Map.Entry thisEntry = (Map.Entry) entries.next();
                             Object key = thisEntry.getKey();
                             ReceiveProgressActivity.getInstance().receiveProgressHashMap.put(key.toString(), 100);
+                            ReceiveProgressActivity.getInstance().fileAdapter.notifyDataSetChanged();
                         }
-                        finish();
                     }
                 }
             } catch (IOException e) {

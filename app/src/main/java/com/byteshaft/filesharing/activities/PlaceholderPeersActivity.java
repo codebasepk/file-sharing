@@ -10,6 +10,7 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
+import android.net.wifi.SupplicantState;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -69,6 +70,7 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
     private boolean foreground = false;
     private boolean connected = true;
     private long scanStartTime;
+    private boolean showingDialog = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +82,12 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
         radarLayout = (FrameLayout) findViewById(R.id.radar_layout);
         mRefreshButton.setOnClickListener(this);
         mWifiManager = (WifiManager) getSystemService(WIFI_SERVICE);
+        IntentFilter intentFilter = new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
+        intentFilter.addAction(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION);
+        intentFilter.addAction(WifiManager.EXTRA_NEW_STATE);
+        intentFilter.addAction(WifiManager.EXTRA_SUPPLICANT_ERROR);
         registerReceiver(
-                mWifiScanReceiver, new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
+                mWifiScanReceiver, intentFilter);
         mScanRequested = true;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -232,6 +238,12 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
                         }, 1000);
                     }
                 }
+            } else if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION .equals(intent.getAction())) {
+                SupplicantState state = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+                if (SupplicantState.isValidState(state)
+                        && state == SupplicantState.DISCONNECTED) {
+
+                }
             }
         }
     };
@@ -375,12 +387,39 @@ public class PlaceholderPeersActivity extends AppCompatActivity implements View.
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if (!completed && foreground)
-                        Toast.makeText(
-                                PlaceholderPeersActivity.this,
-                                "Please try again",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                    if (!completed && foreground && !showingDialog) {
+                        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(PlaceholderPeersActivity.this);
+                        alertDialogBuilder.setTitle("Unable to connect");
+                        alertDialogBuilder.setMessage("Unable to connect to Receiver Phone please try again.")
+                                .setCancelable(false)
+                                .setPositiveButton("Retry", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                dialog.dismiss();
+                                method();
+                            }
+                        });
+                        alertDialogBuilder.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.dismiss();
+                            }
+                        });
+                        alertDialogBuilder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialogInterface) {
+                                showingDialog = false;
+
+                            }
+                        });
+                        AlertDialog alertDialog = alertDialogBuilder.create();
+                        alertDialog.show();
+                        showingDialog = true;
+//                        Toast.makeText(
+//                                PlaceholderPeersActivity.this,
+//                                "Please try again",
+//                                Toast.LENGTH_SHORT
+//                        ).show();
+                    }
                 }
             });
             Log.i("TAG", "exception");
