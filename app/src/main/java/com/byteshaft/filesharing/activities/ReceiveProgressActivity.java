@@ -4,13 +4,10 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
@@ -82,24 +79,15 @@ public class ReceiveProgressActivity extends AppCompatActivity {
             viewHolder.openFileButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    File file = new File(toBeReceived.get(position));
-                    MimeTypeMap mime = MimeTypeMap.getSingleton();
-                    String ext = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-                    String type = mime.getMimeTypeFromExtension(ext);
+                    File fileDirectory = new File(toBeReceived.get(position)).getParentFile();
                     try {
-                        Intent intent = new Intent();
-                        intent.setAction(Intent.ACTION_VIEW);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                            Uri contentUri = FileProvider.getUriForFile(
-                                    getContext(), "com.byteshaft.filesharing.provider", file);
-                            intent.setDataAndType(contentUri, type);
-                        } else {
-                            intent.setDataAndType(Uri.fromFile(file), type);
-                        }
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setDataAndType(Uri.fromFile(fileDirectory), "*/*");
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         startActivity(intent);
                     } catch (ActivityNotFoundException anfe) {
-                        Toast.makeText(getContext(), "No activity found to open this attachment.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), "No activity found to open this attachment.",
+                                Toast.LENGTH_LONG).show();
                     }
                 }
             });
